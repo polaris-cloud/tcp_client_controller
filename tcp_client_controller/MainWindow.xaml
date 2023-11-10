@@ -132,21 +132,21 @@
                                             <StackPanel.Resources>
                                                 <Style TargetType="TextBox" BasedOn="{StaticResource MaterialDesignFloatingHintTextBox}">
                                                     <!-- 在这里定义FloatHintTextBox的样式 -->
-                                                    <Setter Property="Width" Value="100"/>
                                                     <Setter Property="HorizontalContentAlignment" Value="Center"/>
                                                     <Setter Property="FontSize" Value="10"/>
                                                         <!-- 添加其他样式设置 -->
                                                 </Style>
                                             </StackPanel.Resources>
-                                            <TextBox  Text="{Binding Name}" materialDesign:HintAssist.Hint="指令名" />
-                                            <TextBox Text="{Binding Header}" Width="100" materialDesign:HintAssist.Hint="帧头"/>
-                                            <TextBox  Text="{Binding ParameterNumber}" Width="100" materialDesign:HintAssist.Hint="字节数"/>
-                                            <TextBox Text="{Binding Parameter}" Width="100" materialDesign:HintAssist.Hint="参数值"/>
-                                            <Button  Content="{Binding Name}" Width="100" Margin="5"  
+                                                
+                                            <TextBox  Text="{Binding Name}" materialDesign:HintAssist.Hint="指令名"  Margin="20 10"/>
+                                            <TextBox Text="{Binding Header}"  materialDesign:HintAssist.Hint="帧头" Margin="10"/>
+                                            <TextBox  Text="{Binding ParameterNumber}"  materialDesign:HintAssist.Hint="字节数" Margin="20 10"/>
+                                            <TextBox Text="{Binding Parameter}"  materialDesign:HintAssist.Hint="参数值" Margin="20 10"/>
+                                            <Button  Content="{Binding Name}"  Margin="10"  Padding="20 5"
                                                      IsEnabled="{Binding Data.IsConnect,Source={StaticResource DataContextProxy}}"
                                                      Command="{Binding Data.SendOrderCommand,Source={StaticResource DataContextProxy}}"
                                                      CommandParameter="{Binding}" />
-                                            <Button Content="保存"  Width="100" Margin="5" 
+                                            <Button Content="保存"  Margin="10"   Padding="20 5"
                                                     Command="{Binding Data.SaveOrderCommand,Source={StaticResource DataContextProxy}}" 
                                                     CommandParameter="{Binding}"/>
                                             </StackPanel>
@@ -197,7 +197,7 @@
                     <ColumnDefinition />
                     <ColumnDefinition Width="0.6*"/>
                 </Grid.ColumnDefinitions>
-                <CheckBox   Content="应用循环发送" DockPanel.Dock="Top" 
+                <CheckBox   Content="循环发送" DockPanel.Dock="Top" 
                          IsChecked="{Binding IsApplyCycleSend}"
                          Margin="10 5"
                          />

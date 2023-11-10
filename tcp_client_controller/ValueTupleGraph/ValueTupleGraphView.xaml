@@ -12,15 +12,29 @@
              >
 
     <UserControl.Resources>
+        <Style TargetType="TextBox" BasedOn="{StaticResource MaterialDesignFloatingHintTextBox}">
+            <!-- 在这里定义FloatHintTextBox的样式 -->
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <!-- 添加其他样式设置 -->
+        </Style>
         <converters:EnumBooleanConverter  x:Key="EnumBooleanConverter"/>
     </UserControl.Resources>
-    <Grid ShowGridLines="True">
+    <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
             <ColumnDefinition Width="0.5*"/>
         </Grid.ColumnDefinitions>
         <oxy:PlotView  Model="{Binding ValueTuplePlotModel}"/>
-        <DockPanel Grid.Column="1">
+        <DockPanel Grid.Column="1" LastChildFill="False">
+            <Button DockPanel.Dock="Top"  VerticalAlignment="Top"  Command="{Binding ApplyCommand}" HorizontalAlignment="Right" Content="应用" Padding="20 5 20 5"  Margin="5"/>
+            <ScrollViewer DockPanel.Dock="Top">
+                <DockPanel   LastChildFill="False" >
+            <StackPanel DockPanel.Dock="Top" Margin="5">
+                <TextBox materialDesign:HintAssist.Hint="最大曲线数" Margin="5" Text="{Binding MaxLineNum}"/>
+                <TextBox materialDesign:HintAssist.Hint="参数所需字节数" Margin="5" Text="{Binding FrameLength}" IsEnabled="False"/>
+                <TextBox materialDesign:HintAssist.Hint="参数字节数" Margin="5" Text="{Binding FrameBytesNum}" IsEnabled="False"/>
+                        <TextBox materialDesign:HintAssist.Hint="帧头" Margin="5" Text="{Binding Header}"/>
+                    </StackPanel>
             <GroupBox Header="X定义" DockPanel.Dock="Top">
                 <DockPanel LastChildFill="False">
                     <TextBox  DockPanel.Dock="Top" HorizontalAlignment="Left"
@@ -37,9 +51,9 @@
                         <RadioButton Content="参数值"  
                                      IsChecked="{Binding Path=XMode, Converter={StaticResource EnumBooleanConverter}, ConverterParameter=Value}"
                                      Margin="10 5 20 5" DockPanel.Dock="Left"  VerticalAlignment="Center"/>
-                        <TextBox materialDesign:HintAssist.Hint="帧字节数" Margin="5"/>
-                        <TextBox materialDesign:HintAssist.Hint="偏移量" Margin="5"/>
-                        <TextBox materialDesign:HintAssist.Hint="值字节数" Margin="5"/>
+                        
+                        <TextBox materialDesign:HintAssist.Hint="偏移量" Margin="5" Text="{Binding XOffSet}"/>
+                        <TextBox materialDesign:HintAssist.Hint="值字节数" Margin="5" Text="{Binding XParaLength}"/>
                     </StackPanel>
                 </DockPanel>
             </GroupBox>
@@ -60,13 +74,15 @@
                         <RadioButton Content="参数值"  
                                      IsChecked="{Binding Path=YMode, Converter={StaticResource EnumBooleanConverter}, ConverterParameter=Value}"
                                      Margin="10 5 20 5" DockPanel.Dock="Left"  VerticalAlignment="Center"/>
-                        <TextBox materialDesign:HintAssist.Hint="帧字节数" Margin="5"/>
-                        <TextBox materialDesign:HintAssist.Hint="偏移量" Margin="5"/>
-                        <TextBox materialDesign:HintAssist.Hint="值字节数" Margin="5"/>
+                        
+                        <TextBox materialDesign:HintAssist.Hint="偏移量" Margin="5" Text="{Binding YOffSet}"/>
+                        <TextBox materialDesign:HintAssist.Hint="值字节数" Margin="5" Text="{Binding YParaLength}"/>
                     </StackPanel>
                 </DockPanel>
             </GroupBox>
-            <Button Command="{Binding ApplyCommand}" HorizontalAlignment="Right" Content="应用" Padding="20 5 20 5"  Margin="5"/>
+        </DockPanel>
+        </ScrollViewer>
+         
         </DockPanel>
     </Grid>
 </UserControl>

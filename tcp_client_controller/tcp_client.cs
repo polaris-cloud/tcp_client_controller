@@ -13,7 +13,7 @@ namespace tcp_client_controller
    //     public string IP;
    //     public string Port;
    //     public string send_msg;
-   //     public string recv_msg;
+   //     public string recvMsg;
    //     public bool bIsHex;
    //     public bool bIsApplyCycleSend;
    //     public bool CycleTime;
@@ -123,8 +123,8 @@ namespace tcp_client_controller
    //             while (true)
    //             {
    //                 int len = client.Receive(buffer);
-   //                 recv_msg = Encoding.UTF8.GetString(buffer, 0, len);
-   //                 deal_recv_event(recv_msg);
+   //                 recvMsg = Encoding.UTF8.GetString(buffer, 0, len);
+   //                 deal_recv_event(recvMsg);
    //             }
    //         }
    //              );

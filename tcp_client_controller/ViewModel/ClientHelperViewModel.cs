@@ -21,6 +21,12 @@ using MotorDetection.RealDetection.ViewModels;
 using OxyPlot.Axes;
 using OxyPlot.Legends;
 using OxyPlot;
+using System.Collections.Concurrent;
+using MahApps.Metro.Controls;
+using Microsoft.Extensions.Logging;
+using OxyPlot.Series;
+using static MaterialDesignThemes.Wpf.Theme;
+using System.Windows.Markup;
 
 namespace tcp_client_controller.ViewModel
 {
@@ -200,8 +206,13 @@ namespace tcp_client_controller.ViewModel
                     return false;
                 }
             });
-           if(IsConnect)
-                await recv_msg();
+            if (IsConnect)
+            {
+                _ = AnalyseMsgTask();
+                await ReceiveMsg();
+            }
+
+            
             
 
         }
@@ -237,85 +248,252 @@ namespace tcp_client_controller.ViewModel
         private ObservableCollection<OrderModel> _orders;
         private int _selectIndex=-1;
 
-        public async Task recv_msg()
+
+        #region 偏移量绘图
+
+        //参数长度
+        public int FrameLength
         {
-         IsConnect=await Task.Run(() =>
-            {
-                NetworkStream stream = client.GetStream();
+            get;
+            set;
+        } = 1;
 
-                while (true)
-                {
-                 
-                    try
-                    {
-                        while (true)
-                        {
-                            
-                            // 获取客户端的网络流，用于读取和写入数据
-                            
-                            int totalRead=0;
-                            int bytesRead;
+        public int FrameBytesNum { get; set; } = 4; 
 
-                            // 从客户端接收和处理数据
-                            while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
-                            {
-                                totalRead += bytesRead; 
-                            }
 
-                            
-                            
-                            
-                            StringBuilder strB = new StringBuilder();
-                            for (int i = 0; i <totalRead; i++)
-
-                            {
-
-                                strB.Append(buffer[i].ToString("X2")+" ");
-                              
-                            }
-                            
-                            
-                            
-                            //TCP_Receive_Buff += strB.ToString()+'\n';
-                            RecvFrameNum ++;
-                        }
-                      
-                        
-                    }
-                    catch (Exception e)
-                    {
-                        System.Windows.MessageBox.Show(e.Message);
-                        return false;
-                    }
-
-                }
-            }
-                );
-        }
+        //header 
+        public string Header { get; set; }
 
         
+        
+
+        public int XOffSet
+        {
+            get;
+            set;
+        } = 0;
+
+        public int XParaLength
+        {
+            get;
+            set;
+        } = 2;
+
+
+        public int YOffSet
+        {
+            get;
+            set;
+        } = 2;
+
+        public int YParaLength
+        {
+            get;
+            set;
+        } = 2;
+
+        #endregion
+
+        #region 
+
+        /// <summary>
+        /// 返回帧字典
+        /// </summary>
+        private ConcurrentDictionary<ushort, byte[]> orderResponse = new ConcurrentDictionary<ushort, byte[]>();
+
+
+        public enum ParaType
+        {
+            Byte_8,
+            Ushort_16,
+            short_16,
+            Int_32,
+            Uint_32 ,
+            
+        }
+
+
+
+        //不同功能同时使用时的同步事件信号组
+        //private AutoResetEvent[] m_events = new AutoResetEvent[7];
+
+        //消息队列
+        private BlockingCollection<byte[]> msgQueue = new BlockingCollection<byte[]>();
+        
+        //收到返回帧信号
+        private ManualResetEventSlim m_receiveMsgEvent = new();
+        //断开连接信号
+        private ManualResetEventSlim m_disconnectEvent = new ManualResetEventSlim();
+
+
+      //
+      private int ParaConverter(byte[] buffer, ParaType type)
+      {
+int num = 0;
+          switch (type)
+          {
+              case ParaType.Byte_8:
+                  num = buffer[0];
+                  break;
+              case ParaType.Ushort_16:
+                  num = BitConverter.ToUInt16(buffer, 0);
+                  break;
+              case ParaType.short_16:
+                  num = BitConverter.ToInt16(buffer, 0);
+                    break;
+              case ParaType.Int_32:
+                  num=BitConverter.ToInt32(buffer, 0);
+                  break;
+              case ParaType.Uint_32:
+                  //num = BitConverter.ToUInt32(buffer, 0);
+                    break;
+              default:
+                  throw new ArgumentOutOfRangeException(nameof(type), type, null);
+          }
+
+          return num;
+      }
+
+
+      private async Task ReceiveMsg()
+        {
+            
+                NetworkStream stream = client.GetStream();
+                
+                try
+                {
+                    
+                    // 获取客户端的网络流，用于读取和写入数据
+
+                    
+                while (true)
+                {
+                    int totalRead = 0;
+                    int bytesRead;
+
+                    byte[] headerBytes = HexStringToBytesArray(Header);
+                    //取出帧头+字节
+                    while (totalRead < headerBytes.Length + FrameLength)
+                    {
+                        bytesRead = await stream.ReadAsync(buffer, 0, headerBytes.Length + FrameLength);
+                        totalRead += bytesRead;
+                    }
+                    
+                    //帧头错误,丢弃
+                    if(!buffer.Take(headerBytes.Length).SequenceEqual(headerBytes))
+                    {
+                        await stream.FlushAsync(); 
+                        continue;
+                    }
+
+                    totalRead = 0;
+                    //取出一个字节
+                    byte paraLength = buffer[headerBytes.Length];
+
+                    
+                    if (paraLength != FrameBytesNum)
+                    {
+                        await stream.FlushAsync();
+                        _dispatcher.BeginInvoke(() =>
+                        {
+                            ValueTuplePlotModel.InvalidatePlot(true);
+                        });
+                        continue;
+                    }
+
+                    while (totalRead < paraLength)
+                    {
+                        bytesRead = await stream.ReadAsync(buffer, 0, paraLength);
+                        totalRead += bytesRead;
+                    }
+
+                    if (totalRead == paraLength)
+                    {
+                        
+                        msgQueue.Add(buffer.Take(paraLength).ToArray());
+                        //取出两个字节
+                        //int xPara = BitConverter.ToUInt16(buffer.Skip(XOffSet).Take(XParaLength).Reverse().ToArray(),0);
+                        //int yPara = BitConverter.ToUInt16(buffer.Skip(YOffSet).Take(YParaLength).Reverse().ToArray(), 0);
+                        ////取出两个字节
+                        
+                        //_dispatcher.BeginInvoke(() =>
+                        //{
+                        //    showPointRealTime(xPara,yPara);
+                        //});
+                    }
+                    else
+                    {
+                        await stream.FlushAsync();
+                    }
+                    //
+                    
+                }
+
+                }
+                catch (Exception e)
+                {
+                    
+                    System.Windows.MessageBox.Show(e.Message);
+                    
+                }
+
+                IsConnect = false;
+
+        }
+
+
+        private Task AnalyseMsgTask()
+        {
+            return Task.Run(() =>
+            {
+                while(true)
+                {
+                    var buffer  =msgQueue.Take();
+                    //取出两个字节
+                    int xPara = BitConverter.ToUInt16(buffer.Skip(XOffSet).Take(XParaLength).Reverse().ToArray(), 0);
+                    int yPara = BitConverter.ToUInt16(buffer.Skip(YOffSet).Take(YParaLength).Reverse().ToArray(), 0);
+                    //取出两个字节
+
+                    _dispatcher.BeginInvoke(() =>
+                    {
+                        showPointRealTime(xPara, yPara);
+                    });
+                }
+            });
+        }
+
+
+
         private void send_msg(byte[] buffer)
         {
 
             try
             {
-                
+
                 client.GetStream().Write(buffer, 0, buffer.Length);
                 SendFrameNum++;
-                
+
             }
             catch (Exception e)
             {
                 MessageBox.Show(e.Message);
             }
-            
-        
+
+
         }
+
+
+
+        #endregion
+
+
 
         private bool StopSendFlag = false;
         private DelegateCommand _stopCommand;
         public DelegateCommand StopCommand=>_stopCommand??=new DelegateCommand(()=>StopSendFlag=true);
 
+        
+        
         
         
         
@@ -334,7 +512,7 @@ namespace tcp_client_controller.ViewModel
             {
                 try
                 {
-                    send = tcpSendBuff.Split(' ', ',', '-').Select(str => byte.Parse(str, System.Globalization.NumberStyles.HexNumber)).ToArray();
+                    send = HexStringToBytesArray(tcpSendBuff);
                 }
                 catch
                 {
@@ -398,6 +576,14 @@ namespace tcp_client_controller.ViewModel
 
         }
 
+        private static byte[] HexStringToBytesArray(string tcpSendBuff)
+        {
+            if (string.IsNullOrEmpty(tcpSendBuff))
+                return Array.Empty<byte>();
+            var send = tcpSendBuff.Split(' ', ',', '-').Select(str => byte.Parse(str, System.Globalization.NumberStyles.HexNumber))
+                .ToArray();
+            return send;
+        }
 
 
         #region 指令模式
@@ -546,10 +732,25 @@ public DelegateCommand<object>SendOrderCommand => _sendOrderCommand ??=new Deleg
             set => SetProperty(ref _yTitle, value);
         }
 
+        public int MaxLineNum
+        {
+            get;
+            set;
+        } = 3;
 
-
+        private LineSeries CurRecordLine;
+        private int lineNumber;
+        
+        
         private ViewResolvingPlotModel _valueTuplePlotModel;
         private bool _isListening;
+        private int _FrameLength;
+        private int _xOffSet;
+        private int _xParaLength;
+        private int _yFrameLength;
+        private int _yOffSet;
+        private int _yParaLength;
+        private int _maxLineNum;
 
 
         public ViewResolvingPlotModel ValueTuplePlotModel
@@ -635,15 +836,59 @@ public DelegateCommand<object>SendOrderCommand => _sendOrderCommand ??=new Deleg
             plotModel.InvalidatePlot(false);
         }
 
+        private void showPointRealTime(double x,double y)
+        {
+            if(CurRecordLine==null)
+                CurRecordLine=AddOneSeries(ValueTuplePlotModel,lineNumber.ToString(),true);
+            else if (x< CurRecordLine.Points.Last().X)
+            {
+                //超过清除
+                if (lineNumber == MaxLineNum)
+                {
+                    ValueTuplePlotModel.Series.Clear();
+                    ValueTuplePlotModel.ResetAllAxes();
+                    
+                    lineNumber = 0;
+                }
+                
+                ++lineNumber;
+                CurRecordLine = AddOneSeries(ValueTuplePlotModel, lineNumber.ToString(), true);
+            }
+            CurRecordLine.Points.Add(new DataPoint(x,y));
+            //ValueTuplePlotModel.InvalidatePlot(false);
+        }
 
+
+        public LineSeries AddOneSeries(PlotModel model, string title,
+            bool IsVis)
+        {
+            //  Debug.WriteLine($"{Thread.CurrentThread.ManagedThreadId}");
+
+            var series = new LineSeries()
+            {
+                Title = $"S{title}",
+                StrokeThickness = 1,
+                IsVisible = IsVis,
+                Decimator = Decimator.Decimate
+            };
+            //series.Points.AddRange(titleAndpoints.Item2);
+            lock (model.SyncRoot)
+            {
+                model.Series.Add(series);
+            }
+
+            model.InvalidatePlot(true); //thread-safe 了
+            //Debug.WriteLine($"{model.Legends.First().LegendTitle}-{mode}-{Thread.CurrentThread.ManagedThreadId}");
+            return series;
+        }
 
         #endregion
 
 
 
-        #region  硬件指令发送
+            #region  硬件指令发送
 
-        public async void motor_send()
+            public async void motor_send()
         {
 
             byte[] send = { 0xa1, 0x02, 0x01 ,0x01, 0x42 ,0x48 };

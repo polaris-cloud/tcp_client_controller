@@ -1,0 +1,54 @@
+﻿<UserControl x:Class="Bee.Modules.ModuleName.Views.ProtocolListView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Bee.Modules.ModuleName.Views"
+             xmlns:vm="clr-namespace:Bee.Modules.ModuleName.ViewModels"
+             xmlns:mvvm="http://prismlibrary.com/"
+             mc:Ignorable="d" 
+             mvvm:ViewModelLocator.AutoWireViewModel="True" 
+              d:DataContext="{d:DesignInstance vm:ProtocolListViewModel}"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <DockPanel >
+            <DockPanel DockPanel.Dock="Top">
+                <Label Content="协议数" Margin="5"/>
+                <Button Content="生成" DockPanel.Dock="Right" Margin="5" Padding="20 5"
+                        Command="{Binding GenerateCommand}"
+                        CommandParameter="{Binding ProtocolNum}"
+                        />
+                <TextBox MinWidth="10" DockPanel.Dock="Left" Text="{Binding ProtocolNum}"/>
+                
+            </DockPanel>
+            <ListBox  ItemsSource="{Binding Protocols}" Margin="5">
+            <ListBox.Template>
+                <ControlTemplate>
+                    <ScrollViewer  Background="White">
+                        <StackPanel Orientation="Vertical" IsItemsHost="True"  Margin="2"  ScrollViewer.CanContentScroll="True"/>
+                    </ScrollViewer>
+                </ControlTemplate>
+            </ListBox.Template>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <local:ProtocolView  DataContext="{Binding}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+
+            <ListBox.ItemContainerStyle>
+                <Style  TargetType="ListBoxItem">
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <!--<Setter Property="Background" Value="Blue"/>-->
+                            <Setter Property="Foreground" Value="DarkRed"/>
+                            <Setter Property="FontWeight"  Value="ExtraBlack"/>
+                            <Setter Property="FontStyle" Value="Oblique" />
+                            <Setter Property="FontSize" Value="13" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ListBox.ItemContainerStyle>
+        </ListBox>
+        </DockPanel>
+    </Grid>
+</UserControl>

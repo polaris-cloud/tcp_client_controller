@@ -19,7 +19,6 @@ public class ValueTupleGraphViewModel:BindableBase
         public ValueTupleGraphViewModel(DispatcherObject dispatcher)
         {
             _dispatcherObject = dispatcher;
-            
         }
 
 

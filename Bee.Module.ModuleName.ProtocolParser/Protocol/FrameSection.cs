@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,33 +14,41 @@ namespace Bee.Module.ModuleName.ProtocolParser.Protocol
         CRC16
     }
 
-    internal class FrameSectionBase: IParseSectionToken
+    internal  class FrameSectionBase
     {
         public string Name { get; set; }
         public byte[] Value { get; set; }
         public int Length { get; set; }
 
-        public virtual bool IsRuntimeImportValue { get; } = true;
-        public virtual void Parse(FrameSectionToken token)
+        public  bool IsRuntimeImportValue { get; protected set; } 
+
+        public FrameSectionBase(FrameSectionToken token, byte[] value)
         {
-             Name = token.SectionName;
-             Length = int.Parse(token.Length);
+            Name = token.SectionName;
+            Length = int.Parse(token.Length);
+
+
+            if (value.Length == 0)
+                value = new byte[Length];
+            if (value.Length != Length)
+                throw new ArgumentException($"预设值错误({Name}): {nameof(value)}.Length ({value.Length}) 不等于 token.{nameof(Length)} ({Length})", nameof(value));
+            Value = value;
+            IsRuntimeImportValue= false;
         }
+
+        
     }
 
     internal class FrameCheckedSection : FrameSectionBase
     {
         public FrameCheckMethod CheckMethod { get; set; }
-        public override bool IsRuntimeImportValue { get; } = false;
 
-        
-        
-        public override void Parse(FrameSectionToken token)
+        public FrameCheckedSection(FrameSectionToken token) : base(token, Array.Empty<byte>())
         {
-            base.Parse(token);
+            IsRuntimeImportValue = true;
             switch (token.Action?.ToUpper())
             {
-                case "SUM": 
+                case "SUM":
                     CheckMethod = FrameCheckMethod.Sum;
                     break;
                 case "CRC16":
@@ -49,8 +58,8 @@ namespace Bee.Module.ModuleName.ProtocolParser.Protocol
                     CheckMethod = FrameCheckMethod.None;
                     break;
             }
-
         }
+        
     }
 
     internal class FrameRuntimeSection:  FrameSectionBase
@@ -58,7 +67,16 @@ namespace Bee.Module.ModuleName.ProtocolParser.Protocol
         
         public int LowerLimit { get; set; }
         public int UpperLimit { get; set; }
-        
+
+        public FrameRuntimeSection(FrameSectionToken token) : base(token,Array.Empty<byte>())
+        {
+            IsRuntimeImportValue= true;
+            string[]? limits = token.Operator?.Split('-');
+            if (limits?.Length != 2)
+                return;
+            LowerLimit = Convert.ToInt32(limits[0]);
+            UpperLimit = Convert.ToInt32(limits[1]);
+        }
 
     }
 

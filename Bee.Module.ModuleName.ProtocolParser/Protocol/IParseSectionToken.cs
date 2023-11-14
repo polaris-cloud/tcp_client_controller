@@ -7,6 +7,7 @@ using NuGet.Frameworks;
 
 namespace Bee.Module.ModuleName.ProtocolParser.Protocol
 {
+    [Obsolete]
     internal interface IParseSectionToken
     {
 

@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using Microsoft.VisualBasic;
 
@@ -10,7 +11,7 @@ namespace TcpServerTest
 
         public class internalS : IAnalysisReceived
         {
-            public Task AnalysisReceived()
+            public Task AnalysisReceived(BlockingCollection<byte[]>msgQueue)
             {
                 return Task.CompletedTask;
             }
@@ -22,6 +23,7 @@ namespace TcpServerTest
             //server.Port = 8088;
             server.MaxReceiveLength = 20;
             server.AnalysisStrategy = new internalS();
+            //5秒后自动关闭
             Task.Delay(5000).ContinueWith(t => server.Close());
             try
             {

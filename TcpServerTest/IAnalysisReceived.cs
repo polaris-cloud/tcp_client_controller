@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace TcpServerTest
 {
-    internal interface IAnalysisReceived
+    public interface IAnalysisReceived
     {
-        Task AnalysisReceived();
+        Task AnalysisReceived(BlockingCollection<byte[]> msgQueue);
     }
 }

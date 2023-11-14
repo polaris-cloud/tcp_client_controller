@@ -14,7 +14,7 @@ using System.Transactions;
 
 namespace TcpServerTest
 {
-    internal class TcpServer
+    public class TcpServer
     {
 
         private TcpListener _listener;
@@ -46,7 +46,7 @@ namespace TcpServerTest
                             using (_client = await _listener.AcceptTcpClientAsync(_cts.Token))
                             {
                                 Trace.WriteLine($"Connect To {_client.Client.RemoteEndPoint}");
-                                await Task.WhenAll(AnalysisStrategy.AnalysisReceived(), ReceiveMessage());
+                                await Task.WhenAll(AnalysisStrategy.AnalysisReceived(_msgQueue), ReceiveMessage());
                             }
 
                         }

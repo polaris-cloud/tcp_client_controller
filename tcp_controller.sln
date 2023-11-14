@@ -27,9 +27,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bee", "Bee\Bee\Bee.csproj",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bee.Core", "Bee\Bee.Core\Bee.Core.csproj", "{233479AC-CB9F-4565-B1E2-4A21C95FEE3A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bee.Core.SettingConverterTest", "Bee.Core.SettingConverterTest\Bee.Core.SettingConverterTest.csproj", "{C958D63C-529D-4F75-8A49-9014B29053BA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bee.Core.SettingConverterTest", "Bee.Core.SettingConverterTest\Bee.Core.SettingConverterTest.csproj", "{C958D63C-529D-4F75-8A49-9014B29053BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bee.Module.ModuleName.ProtocolParser", "Bee.Module.ModuleName.ProtocolParser\Bee.Module.ModuleName.ProtocolParser.csproj", "{54F68620-0F19-4626-933B-D3C6CEFA93A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bee.Module.ModuleName.ProtocolParser", "Bee.Module.ModuleName.ProtocolParser\Bee.Module.ModuleName.ProtocolParser.csproj", "{54F68620-0F19-4626-933B-D3C6CEFA93A5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bee.Module.ModuleName.SimulateProtocolCommunicateTest", "Bee.Module.ModuleName.SimulateProtocolCommunicateTest\Bee.Module.ModuleName.SimulateProtocolCommunicateTest.csproj", "{8FFF750F-548C-4C6C-AA0D-B2CC0025E7E9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -126,6 +128,14 @@ Global
 		{54F68620-0F19-4626-933B-D3C6CEFA93A5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{54F68620-0F19-4626-933B-D3C6CEFA93A5}.Release|x64.ActiveCfg = Release|Any CPU
 		{54F68620-0F19-4626-933B-D3C6CEFA93A5}.Release|x64.Build.0 = Release|Any CPU
+		{8FFF750F-548C-4C6C-AA0D-B2CC0025E7E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8FFF750F-548C-4C6C-AA0D-B2CC0025E7E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8FFF750F-548C-4C6C-AA0D-B2CC0025E7E9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8FFF750F-548C-4C6C-AA0D-B2CC0025E7E9}.Debug|x64.Build.0 = Debug|Any CPU
+		{8FFF750F-548C-4C6C-AA0D-B2CC0025E7E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8FFF750F-548C-4C6C-AA0D-B2CC0025E7E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8FFF750F-548C-4C6C-AA0D-B2CC0025E7E9}.Release|x64.ActiveCfg = Release|Any CPU
+		{8FFF750F-548C-4C6C-AA0D-B2CC0025E7E9}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -139,6 +149,7 @@ Global
 		{B8E3C5EF-4FC4-4DCA-B0D2-B65302EA2048} = {597EC47D-EA40-4376-94E8-D09AAFE64D58}
 		{C958D63C-529D-4F75-8A49-9014B29053BA} = {597EC47D-EA40-4376-94E8-D09AAFE64D58}
 		{54F68620-0F19-4626-933B-D3C6CEFA93A5} = {597EC47D-EA40-4376-94E8-D09AAFE64D58}
+		{8FFF750F-548C-4C6C-AA0D-B2CC0025E7E9} = {597EC47D-EA40-4376-94E8-D09AAFE64D58}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BA91F942-0A39-4509-B720-0ACFE95C0086}

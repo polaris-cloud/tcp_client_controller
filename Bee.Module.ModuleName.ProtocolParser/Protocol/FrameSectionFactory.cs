@@ -11,7 +11,7 @@ namespace Bee.Module.ModuleName.ProtocolParser.Protocol
     internal class FrameSectionFactory
     {
 
-        private const string DefaultTokenPattern = @"<([^:?]+)([:?]*)([^<>]*)>:(\d+)";
+        private const string DefaultTokenPattern = @"<([^:?=]*)([:?=]+)([^<>]*)>";
         //匹配device={a2}   function={00}   
         private const string DefaultPairPattern = @"(\b[a-zA-Z0-9\u4e00-\u9fa5]+\b)=\{([a-zA-Z0-9]+)\}";
         private readonly string _tokenPattern;

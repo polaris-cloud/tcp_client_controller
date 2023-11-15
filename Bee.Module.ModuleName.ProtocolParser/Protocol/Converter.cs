@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Bee.Module.ModuleName.ProtocolParser.Protocol
 {
-    internal class Converter
+    public class Converter
     {
         public static ProtocolScript ToProtocolScript(ProtocolFormat format)
         {

@@ -29,7 +29,9 @@ private  readonly List<FrameSectionBase> _responseFrameSections;
 //private  readonly IEnumerable<FrameSectionBase> _responseCheckedSections;
         private  readonly string _importValuePattern = @"(\b[a-zA-Z0-9\u4e00-\u9fa5]+\b)=([a-zA-Z0-9]+)";
 
-
+        public int ResponseFrameLength => GetFrameLength(_responseFrameSections);
+        public int SendFrameLength => GetFrameLength(_sendFrameSections);
+        
 internal ProtocolScript(
     string behavior, 
     string? description,

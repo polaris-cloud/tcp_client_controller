@@ -9,6 +9,6 @@ namespace TcpServerTest
 {
     public interface IAnalysisReceived
     {
-        Task AnalysisReceived(BlockingCollection<byte[]> msgQueue);
+        Task AnalysisReceived(BlockingCollection<byte[]> msgQueue,CancellationTokenSource cts);
     }
 }

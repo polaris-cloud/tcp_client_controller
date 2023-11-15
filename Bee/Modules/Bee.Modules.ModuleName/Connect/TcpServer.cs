@@ -27,28 +27,33 @@ namespace Bee.Modules.ModuleName.Connect
         public int MaxReceiveLength { get; set; }
         public IAnalysisReceived AnalysisStrategy { get; set; }
 
-        public async Task ListenTo(string ip, int port)
+        public async Task ListenTo(string ip, int port, bool isSyncTransRec= true)
         {
             _listener = new TcpListener(IPAddress.Parse(ip), port);
             using (_cts = new CancellationTokenSource())
             using (_msgQueue = new BlockingCollection<byte[]>())
 
-                // 开始监听客户端连接
-                while (!_cts.IsCancellationRequested)
+                try
                 {
                     _listener.Start();
-                    // 接受一个客户端连接
-                    using (_client = await _listener.AcceptTcpClientAsync(_cts.Token))
+                    // 开始监听客户端连接
+                    while (!_cts.IsCancellationRequested)
                     {
-                        Trace.WriteLine($"Connect To {_client.Client.RemoteEndPoint}");
-                        await Task.WhenAll(AnalysisStrategy.AnalysisReceived(), ReceiveMessage());
+
+                        // 接受一个客户端连接
+                        using (_client = await _listener.AcceptTcpClientAsync(_cts.Token))
+                        {
+                            Trace.WriteLine($"Connect To {_client.Client.RemoteEndPoint}");
+                            await Task.WhenAll(AnalysisStrategy.AnalysisReceived(_msgQueue,_cts), ReceiveMessage());
+                        }
+
                     }
-
                 }
-
-
+                finally
+                {
+                    _listener.Stop();
+                }
         }
-
 
         public void Close()
         {
@@ -64,6 +69,36 @@ namespace Bee.Modules.ModuleName.Connect
             return stream.WriteAsync(bytes, 0, bytes.Length, _cts.Token);
         }
 
+        public async Task<byte[]> SendProtocolSyncReceive(byte[] bytes, int responseLength,int millisecondsTimeout=1000)
+        {
+            
+
+            NetworkStream stream = _client.GetStream();
+            await stream.WriteAsync(bytes, 0, bytes.Length, _cts.Token);
+            stream.ReadTimeout = millisecondsTimeout;
+            List<byte> res = new List<byte>();
+            byte[]buffer =new byte[responseLength];
+            try
+            {
+                
+                while (!_cts.IsCancellationRequested &&
+                       (await stream.ReadAsync(buffer, 0, responseLength, _cts.Token)) > 0)
+                {
+                    res.AddRange(buffer);
+                    if (res.Count > responseLength)
+                        break;
+                }
+            }
+            catch (Exception e)
+            {
+                stream.Flush();
+                throw;
+            }
+            
+            return res .GetRange(0, Math.Min(res.Count,responseLength)).ToArray();
+
+        }
+        
 
 
         private async Task ReceiveMessage()

@@ -5,13 +5,13 @@ using Microsoft.VisualBasic;
 namespace TcpServerTest
 {
     [TestClass]
-    public class UnitTest
+    public class TcpServerTest
     {
         private TcpServer server = new TcpServer();
 
         public class internalS : IAnalysisReceived
         {
-            public Task AnalysisReceived(BlockingCollection<byte[]>msgQueue)
+            public Task AnalysisReceived(BlockingCollection<byte[]>msgQueue, CancellationTokenSource cts)
             {
                 return Task.CompletedTask;
             }

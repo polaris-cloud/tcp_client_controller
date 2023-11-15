@@ -22,49 +22,80 @@ namespace TcpServerTest
         private CancellationTokenSource _cts;
         private BlockingCollection<byte[]> _msgQueue ;
 
+        private TaskCompletionSource _continuousListening;
 
-
-        //public string IP{ get; set;  }
+        //public string IP{ get; set; }
         //public int Port { get; set; }
         public int MaxReceiveLength { get; set; }
         public IAnalysisReceived AnalysisStrategy { get; set; }
-        
-        public async Task ListenTo(string ip, int port)
+
+internal   class Default : IAnalysisReceived
         {
-            _listener = new TcpListener(IPAddress.Parse(ip),port);
-            using (_cts = new CancellationTokenSource()) 
-                using (_msgQueue =new BlockingCollection<byte[]>())
-
-                    try
-                    {
-                        _listener.Start();
-                        // 开始监听客户端连接
-                        while (!_cts.IsCancellationRequested)
-                        {
-
-                            // 接受一个客户端连接
-                            using (_client = await _listener.AcceptTcpClientAsync(_cts.Token))
-                            {
-                                Trace.WriteLine($"Connect To {_client.Client.RemoteEndPoint}");
-                                await Task.WhenAll(AnalysisStrategy.AnalysisReceived(_msgQueue), ReceiveMessage());
-                            }
-
-                        }
-                    }
-                    finally
-                    {
-                        _listener.Stop();
-                    }
-
-
-
-
+            public Task AnalysisReceived(BlockingCollection<byte[]> msgQueue, CancellationTokenSource cts)
+            {
+                return Task.CompletedTask;
+            }
         }
 
 
-        public  void Close()
+        public TcpServer()
+        {
+            AnalysisStrategy = new Default();
+            MaxReceiveLength = 1024; 
+        }
+
+        public async Task ListenTo(string ip, int port, bool isSyncTransRec = true)
+        {
+            _listener = new TcpListener(IPAddress.Parse(ip), port);
+            _continuousListening = new TaskCompletionSource();
+            using (_cts = new CancellationTokenSource())
+            using (_msgQueue = new BlockingCollection<byte[]>())
+
+                try
+                {
+                    _listener.Start();
+                    // 开始监听客户端连接
+                    while (!_cts.IsCancellationRequested)
+                    {
+
+                        // 接受一个客户端连接
+                        using (_client = await _listener.AcceptTcpClientAsync(_cts.Token))
+                        {
+                            Trace.WriteLine($"Connect To {_client.Client.RemoteEndPoint}");
+                            if (isSyncTransRec)
+                                await Task.Delay(-1, _cts.Token);
+                            else
+                                await Task.WhenAll(AnalysisStrategy.AnalysisReceived(_msgQueue,_cts), ReceiveMessage());
+                        }
+
+                    }
+                }
+                finally
+                {
+                    _listener.Stop();
+                    Trace.WriteLine($"stop listener");
+                }
+        }
+
+        [Obsolete]
+        public async Task ListenToOnce(string ip, int port)
+        {
+            _listener = new TcpListener(IPAddress.Parse(ip), port);
+            _continuousListening = new TaskCompletionSource();
+            _cts = new CancellationTokenSource();
+            _msgQueue = new BlockingCollection<byte[]>();
+                    _listener.Start();
+                        // 接受一个客户端连接
+                        _client = await _listener.AcceptTcpClientAsync(_cts.Token);
+                            Trace.WriteLine($"Connect To {_client.Client.RemoteEndPoint}");
+        }
+
+
+
+        public void Close()
         {
                     _cts.Cancel();
+                    //_continuousListening.SetResult();
             }
 
         
@@ -75,9 +106,37 @@ namespace TcpServerTest
               NetworkStream stream = _client.GetStream();
              return stream.WriteAsync(bytes, 0, bytes.Length, _cts.Token);
         }
-            
-        
-        
+
+        public async Task<byte[]> SendProtocolSyncReceive(byte[] bytes, int responseLength, int millisecondsTimeout = 1000)
+        {
+
+
+            NetworkStream stream = _client.GetStream();
+            await stream.WriteAsync(bytes, 0, bytes.Length, _cts.Token);
+            stream.ReadTimeout = millisecondsTimeout;
+            List<byte> res = new List<byte>();
+            byte[] buffer = new byte[responseLength];
+            try
+            {
+
+                while (!_cts.IsCancellationRequested &&
+                       (await stream.ReadAsync(buffer, 0, responseLength, _cts.Token)) > 0)
+                {
+                    res.AddRange(buffer);
+                    if (res.Count >= responseLength)
+                        break;
+                }
+            }
+            catch (Exception e)
+            {
+                stream.Flush();
+                throw;
+            }
+
+            return res.GetRange(0, Math.Min(res.Count, responseLength)).ToArray();
+
+        }
+
         private async Task ReceiveMessage()
         {
              await using NetworkStream stream = _client.GetStream();

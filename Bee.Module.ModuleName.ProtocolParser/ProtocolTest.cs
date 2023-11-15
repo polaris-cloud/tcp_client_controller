@@ -7,18 +7,12 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 namespace Bee.Module.ModuleName.ProtocolParser
 {
     [TestClass]
-    public class UnitTest
+    public class ProtocolTest
     {
         string sendRule =
-            @"<device>:1 | <function>:1 | <datalength>:1 | <x轴:(-32767-32767)>:4 |<y轴:(-32767-32767)>:4 |<是否响应:>:1 |<crc?CRC16>:2
-                       device={a2}
-                        function={00}
-                     datalength={09}";
+            @"<={a2 00 09}><x轴(-32767-32767):4><y轴(-32767-32767):4><是否响应(否0,是1):1><?CRC16>";
 
-        string reponseRule = @"<device>:1 | <function>:1 | <datalength>:1 | <crc?CRC16>:2
- device={a2}
- function={00}
- datalength={00}";
+        string reponseRule = @"<={a2 00 00}><?crc16>}";
         
         
         
@@ -29,10 +23,15 @@ namespace Bee.Module.ModuleName.ProtocolParser
         public void TestParseFrameRule()
         {
 
-
+            Trace.WriteLine($"解析发送");
             foreach (var p in factory.ParseFrameRule(sendRule))
             {
-                Trace.Write($"{p.SectionName} {p.Operator} {p.Action} {p.Length}\n");
+                Trace.WriteLine($"{p.SectionName}| {p.Operator} |{p.Action}| {p.Length}");
+            }
+            Trace.WriteLine($"解析接收");
+            foreach (var p in factory.ParseFrameRule(reponseRule))
+            {
+                Trace.WriteLine($"{p.SectionName}| {p.Operator} |{p.Action}| {p.Length}");
             }
         }
 

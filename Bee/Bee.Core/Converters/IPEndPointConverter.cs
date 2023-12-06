@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net;
 
-namespace MotorDetection.SettingManager
+namespace Bee.Core.Converters
 {
     public class IPEndPointConverter : JsonConverter
     {

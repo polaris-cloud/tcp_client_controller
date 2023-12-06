@@ -1,21 +1,22 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Runtime.Intrinsics.X86;
-using Bee.Module.ModuleName.ProtocolParser.Protocol;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Bee.Core.Protocol;
+using Bee.Core.Protocol.enums;
+using Bee.Core.Protocol.Model;
+using Bee.Core.Protocol.Model.Section;
 
-namespace Bee.Module.ModuleName.ProtocolParser
+namespace Bee.Module.Script.ProtocolParser
 {
     [TestClass]
     public class ProtocolTest
     {
         string sendRule =
-            @"<={a2 00 09}><xÖá(-32767-32767):4><yÖá(-32767-32767):4><ÊÇ·ñÏìÓ¦(·ñ0,ÊÇ1):1><?CRC16>";
+            @"<={a2 00 09}><xÖá:(-32767/32767)|4><yÖá:(-32767/32767)|4><ÊÇ·ñÏìÓ¦:(0/1)|1><?CRC16|2>";
 
-        string reponseRule = @"<={a2 00 00}><?crc16>}";
-        
-        
-        
+        string reponseRule = @"<={a2 00 00}><?crc16|2>}";
+
+
+
         //string reponseRule = "";
         private FrameSectionFactory factory = new FrameSectionFactory();
 
@@ -36,37 +37,50 @@ namespace Bee.Module.ModuleName.ProtocolParser
         }
 
 
-        [TestMethod]
-        public void TestParseValuePair()
-        {
-            foreach (var p in factory.ParseValuePair(sendRule))
-            {
-                Trace.Write($" {p.Key} {string.Join(" ", p.Value.Select(t => t.ToString("X2")))}\n");
-            }
-        }
+        //[TestMethod]
+        //[Obsolete]
+        //public void TestParseValuePair()
+        //{
+        //    foreach (var p in factory.ParseValuePair(sendRule))
+        //    {
+        //        Trace.Write($" {p.Key} {string.Join(" ", p.Value.Select(t => t.ToString("X2")))}\n");
+        //    }
+        //}
 
         [TestMethod]
         public void TestParseSectionTokens()
         {
 
-            foreach (var p in factory.ParseSection(sendRule))
+            foreach (var p in factory.ParseSection(sendRule, ProtocolEndian.BigEndian, ProtocolEncodeFormat.Hex))
             {
-                Trace.Write($"{p.GetType().FullName} {p.Name} {p.Length} \n");
+                Trace.Write($"{p.GetType().FullName} \n");
             }
         }
 
+        [TestMethod]
+        public void TestValidateRuntimeToken()
+        {
 
+            foreach (var p in factory.ParseSection(sendRule, ProtocolEndian.BigEndian, ProtocolEncodeFormat.Hex))
+            {
+                if (p is FrameRuntimeSection r)
+                    Trace.WriteLine(r.Validate("33000"));
+            }
+        }
 
         [TestMethod]
         public void TestParseProtocol()
         {
             ProtocolFormat format = new ProtocolFormat()
             {
-                Name = "Õñ¾µÒÆ¶¯", BehaviorKeyword = "MoveOsc", SendFrameRule = sendRule, ResponseFrameRule = reponseRule
+                SendFrameDescription = "Õñ¾µÒÆ¶¯",
+                BehaviorKeyword = "MoveOsc",
+                SendFrameRule = sendRule,
+                ResponseFrameRule = reponseRule
             };
-            ProtocolScript protocolScript = Converter.ToProtocolScript(format);
-            string sendScript = protocolScript.GenerateSendScript();
-            //string responseScript = protocolScript.GenerateResponseScript();
+            ProtocolScriptParser protocolScriptParser = ProtocolScriptParser.BuildScriptParser(format);
+            string sendScript = protocolScriptParser.GenerateSendScript();
+            //string responseScript = protocolScriptParser.GenerateResponseScript();
 
             Trace.WriteLine(sendScript);
             //Trace.WriteLine(responseScript);
@@ -76,28 +90,29 @@ namespace Bee.Module.ModuleName.ProtocolParser
         public void TestConvertValue()
         {
             ProtocolFormat format = new ProtocolFormat()
-                { Name = "Õñ¾µÒÆ¶¯", SendFrameRule = sendRule, ResponseFrameRule = reponseRule };
-            ProtocolScript protocolScript = Converter.ToProtocolScript(format);
-            var ar = protocolScript.ConvertValueStringToBytes(ProtocolEncodeFormat.Hex, "12040",4);
+            { SendFrameDescription = "Õñ¾µÒÆ¶¯", SendFrameRule = sendRule, ResponseFrameRule = reponseRule };
+            ProtocolScriptParser protocolScriptParser = ProtocolScriptParser.BuildScriptParser(format);
+            //var ar = protocolScriptParser.ConvertValueStringToBytes(ProtocolEncodeFormat.Hex, "12040",4);
         }
 
         [TestMethod]
         public void TestGenerateSendFrame()
         {
             ProtocolFormat format = new ProtocolFormat()
-                { Name = "Õñ¾µÒÆ¶¯", SendFrameRule = sendRule, ResponseFrameRule = reponseRule };
-            ProtocolScript protocolScript = Converter.ToProtocolScript(format);
-            var ar = protocolScript.GenerateSendByteFrame("MoveOsc xÖá=1000 yÖá=1000 ÊÇ·ñÏìÓ¦=1");
+            { SendFrameDescription = "Õñ¾µxÖáÒÆ¶¯{xÖá},yÖáÒÆ¶¯{yÖá}", SendFrameRule = sendRule, ResponseFrameRule = reponseRule };
+            ProtocolScriptParser protocolScriptParser = ProtocolScriptParser.BuildScriptParser(format);
+            var ar = protocolScriptParser.GenerateSendFrame("MoveOsc xÖá=1000 yÖá=1000 ÊÇ·ñÏìÓ¦=1", out string debugLine);
             var s = ar.Select(a => a.ToString("X2"));
             Trace.WriteLine(string.Join(" ", s));
+            Trace.WriteLine(debugLine);
         }
         [TestMethod]
         public void TestGenerateResponseResult()
         {
             ProtocolFormat format = new ProtocolFormat()
-                { Name = "Õñ¾µÒÆ¶¯", SendFrameRule = sendRule, ResponseFrameRule = sendRule };
-            ProtocolScript protocolScript = Converter.ToProtocolScript(format);
-            protocolScript.ParseResponseByteFrame(new byte[] { 0xa2, 00, 09,00,00,03,0xe8,0,0,0x03,0xe8,0x01, 0x95,0xc3});
+            { SendFrameDescription = "Õñ¾µÒÆ¶¯", SendFrameRule = sendRule, ResponseFrameRule = sendRule };
+            ProtocolScriptParser protocolScriptParser = ProtocolScriptParser.BuildScriptParser(format);
+            protocolScriptParser.ParseResponseByteFrame(new byte[] { 0xa2, 00, 09, 00, 00, 03, 0xe8, 0, 0, 0x03, 0xe8, 0x01, 0x95, 0xc3 });
 
         }
 
@@ -105,11 +120,43 @@ namespace Bee.Module.ModuleName.ProtocolParser
         public void TestGenerateResponseScript()
         {
             ProtocolFormat format = new ProtocolFormat()
-                { Name = "Õñ¾µÒÆ¶¯",BehaviorKeyword = "MoveOsc", SendFrameRule = sendRule, ResponseFrameRule = sendRule };
-            ProtocolScript protocolScript = Converter.ToProtocolScript(format);
-            var res=protocolScript.GenerateResponseScript(new byte[] { 0xa2, 00, 09, 00, 00, 03, 0xe8, 0, 0, 0x03, 0xe8, 0x01, 0x95, 0xc3 });
-Trace.WriteLine(res);
+            { ResponseFrameDescription = "Õñ¾µxÖáÒÆ¶¯{xÖá},yÖáÒÆ¶¯{yÖá}", BehaviorKeyword = "MoveOsc", SendFrameRule = sendRule, ResponseFrameRule = sendRule };
+            ProtocolScriptParser protocolScriptParser = ProtocolScriptParser.BuildScriptParser(format);
+            var res = protocolScriptParser.GenerateResponseDebugLine(new byte[] { 0xa2, 00, 09, 00, 00, 03, 0xe8, 0, 0, 0x03, 0xe8, 0x01, 0x95, 0xc3 });
+            Trace.WriteLine(res);
         }
+
+
+
+        [TestMethod]
+        public void TestReplacePlaceholders()
+        {
+            //ProtocolFormat format = new ProtocolFormat()
+            //    { Name = "Õñ¾µÒÆ¶¯", BehaviorKeyword = "MoveOsc", SendFrameRule = sendRule, ResponseFrameRule = sendRule };
+            //ProtocolScriptParser protocolScriptParser = ProtocolScriptParser.BuildScriptParser(format);
+            //var res = protocolScriptParser.GenerateResponseScript(new byte[] { 0xa2, 00, 09, 00, 00, 03, 0xe8, 0, 0, 0x03, 0xe8, 0x01, 0x95, 0xc3 });
+            //Trace.WriteLine(res);
+
+            string inputString = "Õñ¾µxÖáÒÆ¶¯{xÖá}²½£¬yÖáÒÆ¶¯{yÖá}²½";
+            string[] valuepair = new string[]
+            {
+                "xÖá=1000",
+                "yÖá=1000"
+            };
+            var dic = valuepair.Select(t => t.Split("=")).
+                ToDictionary(t => t[0], t => t[1]);
+
+            foreach (var pair in dic)
+            {
+                inputString = inputString.Replace($"{{{pair.Key}}}", pair.Value);
+            }
+
+            Trace.WriteLine(inputString);
+
+        }
+
+
+
 
         public class Test
         {
@@ -171,8 +218,8 @@ Trace.WriteLine(res);
 
             var enumerable = Enumerable.Range(1, 5).Select(i =>
             {
-                return new Test(){Num= i};
-            }).Where(test=>
+                return new Test() { Num = i };
+            }).Where(test =>
             {
                 Trace.WriteLine(test.Num);
                 return test.Num > 3;

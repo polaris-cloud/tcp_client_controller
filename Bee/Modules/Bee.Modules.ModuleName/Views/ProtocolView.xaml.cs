@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Bee.Modules.ModuleName.Views
+namespace Bee.Modules.Script.Views
 {
     /// <summary>
     /// ProtocolView.xaml 的交互逻辑

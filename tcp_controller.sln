@@ -5,11 +5,11 @@ VisualStudioVersion = 17.6.33801.468
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{597EC47D-EA40-4376-94E8-D09AAFE64D58}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bee.Modules.ModuleName.Tests", "Bee\Tests\Bee.Modules.ModuleName.Tests\Bee.Modules.ModuleName.Tests.csproj", "{96BFE724-DF1D-4DF9-92E7-16AC5115A511}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bee.Modules.Script.Tests", "Bee\Tests\Bee.Modules.ModuleName.Tests\Bee.Modules.Script.Tests.csproj", "{96BFE724-DF1D-4DF9-92E7-16AC5115A511}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{2CC0944F-DEE1-407F-A0BE-30F84A7B690C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bee.Modules.ModuleName", "Bee\Modules\Bee.Modules.ModuleName\Bee.Modules.ModuleName.csproj", "{E047074F-4EED-4459-99B3-CCE69E5C04BB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bee.Modules.Script", "Bee\Modules\Bee.Modules.ModuleName\Bee.Modules.Script.csproj", "{E047074F-4EED-4459-99B3-CCE69E5C04BB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{F172A8C5-78B9-447C-B2D1-8A723ADA0213}"
 EndProject
@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bee.Services.Interfaces", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "tcp_client_controller", "tcp_client_controller\tcp_client_controller.csproj", "{2E40FF08-FCF8-4DEB-8192-4D9C501C1C76}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "canvas_test", "canvas_test\canvas_test.csproj", "{A18C3080-F550-4AD7-B8A5-FA9E9D9D479A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "rectangle_drag_test", "canvas_test\rectangle_drag_test.csproj", "{A18C3080-F550-4AD7-B8A5-FA9E9D9D479A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bee. Module.ModuleName.TcpServerTest", "TcpServerTest\Bee. Module.ModuleName.TcpServerTest.csproj", "{B8E3C5EF-4FC4-4DCA-B0D2-B65302EA2048}"
 EndProject
@@ -29,9 +29,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bee.Core", "Bee\Bee.Core\Be
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bee.Core.SettingConverterTest", "Bee.Core.SettingConverterTest\Bee.Core.SettingConverterTest.csproj", "{C958D63C-529D-4F75-8A49-9014B29053BA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bee.Module.ModuleName.ProtocolParser", "Bee.Module.ModuleName.ProtocolParser\Bee.Module.ModuleName.ProtocolParser.csproj", "{54F68620-0F19-4626-933B-D3C6CEFA93A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bee.Module.Script.ProtocolParser", "Bee.Module.ModuleName.ProtocolParser\Bee.Module.Script.ProtocolParser.csproj", "{54F68620-0F19-4626-933B-D3C6CEFA93A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bee.Module.ModuleName.SimulateProtocolCommunicateTest", "Bee.Module.ModuleName.SimulateProtocolCommunicateTest\Bee.Module.ModuleName.SimulateProtocolCommunicateTest.csproj", "{8FFF750F-548C-4C6C-AA0D-B2CC0025E7E9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bee.Module.Script.SimulateProtocolCommunicateTest", "Bee.Module.ModuleName.SimulateProtocolCommunicateTest\Bee.Module.Script.SimulateProtocolCommunicateTest.csproj", "{8FFF750F-548C-4C6C-AA0D-B2CC0025E7E9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bee.Modules.Communication", "Bee.Modules.Communication\Bee.Modules.Communication.csproj", "{E1DCFAAA-5178-486A-A628-E735C20D1572}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptEditorTest", "ScriptEditorTest\ScriptEditorTest.csproj", "{C24258CC-9F82-45F9-8251-7BF6B7C543FF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -136,6 +140,22 @@ Global
 		{8FFF750F-548C-4C6C-AA0D-B2CC0025E7E9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8FFF750F-548C-4C6C-AA0D-B2CC0025E7E9}.Release|x64.ActiveCfg = Release|Any CPU
 		{8FFF750F-548C-4C6C-AA0D-B2CC0025E7E9}.Release|x64.Build.0 = Release|Any CPU
+		{E1DCFAAA-5178-486A-A628-E735C20D1572}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1DCFAAA-5178-486A-A628-E735C20D1572}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1DCFAAA-5178-486A-A628-E735C20D1572}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E1DCFAAA-5178-486A-A628-E735C20D1572}.Debug|x64.Build.0 = Debug|Any CPU
+		{E1DCFAAA-5178-486A-A628-E735C20D1572}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1DCFAAA-5178-486A-A628-E735C20D1572}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1DCFAAA-5178-486A-A628-E735C20D1572}.Release|x64.ActiveCfg = Release|Any CPU
+		{E1DCFAAA-5178-486A-A628-E735C20D1572}.Release|x64.Build.0 = Release|Any CPU
+		{C24258CC-9F82-45F9-8251-7BF6B7C543FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C24258CC-9F82-45F9-8251-7BF6B7C543FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C24258CC-9F82-45F9-8251-7BF6B7C543FF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C24258CC-9F82-45F9-8251-7BF6B7C543FF}.Debug|x64.Build.0 = Debug|Any CPU
+		{C24258CC-9F82-45F9-8251-7BF6B7C543FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C24258CC-9F82-45F9-8251-7BF6B7C543FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C24258CC-9F82-45F9-8251-7BF6B7C543FF}.Release|x64.ActiveCfg = Release|Any CPU
+		{C24258CC-9F82-45F9-8251-7BF6B7C543FF}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -150,6 +170,8 @@ Global
 		{C958D63C-529D-4F75-8A49-9014B29053BA} = {597EC47D-EA40-4376-94E8-D09AAFE64D58}
 		{54F68620-0F19-4626-933B-D3C6CEFA93A5} = {597EC47D-EA40-4376-94E8-D09AAFE64D58}
 		{8FFF750F-548C-4C6C-AA0D-B2CC0025E7E9} = {597EC47D-EA40-4376-94E8-D09AAFE64D58}
+		{E1DCFAAA-5178-486A-A628-E735C20D1572} = {2CC0944F-DEE1-407F-A0BE-30F84A7B690C}
+		{C24258CC-9F82-45F9-8251-7BF6B7C543FF} = {597EC47D-EA40-4376-94E8-D09AAFE64D58}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BA91F942-0A39-4509-B720-0ACFE95C0086}

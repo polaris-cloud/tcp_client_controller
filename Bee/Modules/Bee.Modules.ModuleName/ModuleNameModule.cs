@@ -1,10 +1,11 @@
 ﻿using Bee.Core;
-using Bee.Modules.ModuleName.Views;
+using Bee.Modules.Script.Models;
+using Bee.Modules.Script.Views;
 using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Regions;
 
-namespace Bee.Modules.ModuleName
+namespace Bee.Modules.Script
 {
     public class ModuleNameModule : IModule
     {
@@ -23,8 +24,9 @@ namespace Bee.Modules.ModuleName
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterForNavigation<ViewA>();
-            containerRegistry.RegisterForNavigation<MainOrderView>(); 
+            containerRegistry.RegisterForNavigation<MainOrderView>();
             containerRegistry.RegisterForNavigation<ProtocolListView>();
+            containerRegistry.RegisterSingleton<InstructionSetDao>();
         }
     }
 }

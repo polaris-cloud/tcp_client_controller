@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Bee.Core.Json;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace Bee.Core.SettingConverterTest

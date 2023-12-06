@@ -1,30 +1,31 @@
-﻿<UserControl x:Class="Bee.Modules.ModuleName.Views.ProtocolView"
+﻿<UserControl x:Class="Bee.Modules.Script.Views.ProtocolView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Bee.Modules.ModuleName.Views"
-             xmlns:core="clr-namespace:Bee.Modules.ModuleName"
-             xmlns:bee="clr-namespace:Bee.Core.Controls;assembly=Bee.Core"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:models="clr-namespace:Bee.Modules.Script.Models"
              mc:Ignorable="d" 
-             d:DataContext="{d:DesignInstance core:Protocol}"
+             d:DataContext="{d:DesignInstance models:ProtocolFormatDao}"
              >
-  
         <DockPanel>
-        <Label Content="{Binding Num}" Margin="5" 
-               Foreground="{Binding Foreground,RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}}}"/>
-        <Label Content="功能名" Margin="5"/>
-        <bee:HexInputBox  Text="{Binding FunctionName}" MinWidth="100" Margin="5" TextWrapping="WrapWithOverflow"/>
-        <Label Content="帧头" Margin="5"/>
-            <bee:HexInputBox  Text="{Binding Header}"    MinWidth="100" Margin="5" TextWrapping="WrapWithOverflow"/>
-            <Label Content="数据区长度" Margin="5"/>
-            <bee:HexInputBox  Text="{Binding DataLength}" MinWidth="100" Margin="5" TextWrapping="Wrap"/>
-            <Label Content="读写模式" Margin="5"/>
-            <ComboBox   MinWidth="100" Margin="5" />
-
-        <!--<Label Content="数据区" Margin="5"/>
-            <bee:HexInputBox  Text="{Binding Data}" MinWidth="100" Margin="5" TextWrapping="Wrap"/>-->
-            <Label Content="帧尾" Margin="5"/>
-            <bee:HexInputBox  Text="{Binding Roar}" MinWidth="100" Margin="5" TextWrapping="Wrap"/>
+            <DockPanel Dock="Top">
+        <Label Content="指令" Margin="5"/>
+        <TextBox  Text="{Binding BehaviorKeyword}"    MinWidth="100" Margin="5" TextWrapping="WrapWithOverflow"/>
+        
+        </DockPanel>
+            <DockPanel>
+            <StackPanel DockPanel.Dock="Top">
+                <Label Content="发送帧格式" Margin="5"/>
+            <TextBox  Text="{Binding SendFrameRule}" MinWidth="100" MinHeight="40" Margin="5" TextWrapping="Wrap"/>
+                <Label Content="描述" Margin="5"/>
+                <TextBox  Text="{Binding SendDescription}" MinWidth="100" Margin="5" TextWrapping="WrapWithOverflow"/>
+            </StackPanel>
+            <StackPanel>
+                <Label Content="响应帧格式" Margin="5"/>
+                <TextBox  Text="{Binding ResponseFrameRule}" MinWidth="100" MinHeight="40"  Margin="5" TextWrapping="Wrap"/>
+                <Label Content="描述" Margin="5"/>
+                <TextBox  Text="{Binding ResponseDescription}" MinWidth="100" Margin="5" TextWrapping="WrapWithOverflow"/>
+            </StackPanel>
+        </DockPanel>
         </DockPanel>
 </UserControl>

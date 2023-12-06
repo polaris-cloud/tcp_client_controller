@@ -9,7 +9,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Bee.Core\Bee.Core.csproj" />
-    <ProjectReference Include="..\Modules\Bee.Modules.ModuleName\Bee.Modules.ModuleName.csproj" />
+    <ProjectReference Include="..\Modules\Bee.Modules.ModuleName\Bee.Modules.Script.csproj" />
     <ProjectReference Include="..\Services\Bee.Services.Interfaces\Bee.Services.Interfaces.csproj" />
     <ProjectReference Include="..\Services\Bee.Services\Bee.Services.csproj" />
   </ItemGroup>

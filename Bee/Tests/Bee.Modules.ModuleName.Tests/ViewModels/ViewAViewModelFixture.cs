@@ -1,10 +1,10 @@
-﻿using Bee.Modules.ModuleName.ViewModels;
+﻿using Bee.Modules.Script.ViewModels;
 using Bee.Services.Interfaces;
 using Moq;
 using Prism.Regions;
 using Xunit;
 
-namespace Bee.Modules.ModuleName.Tests.ViewModels
+namespace Bee.Modules.Script.Tests.ViewModels
 {
     public class ViewAViewModelFixture
     {

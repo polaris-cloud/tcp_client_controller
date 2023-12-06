@@ -1,0 +1,28 @@
+﻿<Window x:Class="ScriptEditorTest.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ScriptEditorTest"
+        xmlns:script="clr-namespace:ScriptEditorTest.ScriptEditor"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid Visibility="Collapsed">
+        <RichTextBox Name="scriptEditor" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                      PreviewTextInput="ScriptEditor_PreviewTextInput">
+            <RichTextBox.ContextMenu>
+                <ContextMenu>
+                    <!--<MenuItem Header="Insert Command" Click="InsertCommand_Click"/>-->
+                </ContextMenu>
+            </RichTextBox.ContextMenu>
+           
+        </RichTextBox>
+        <ListBox Name="IntellisenseBox"  HorizontalAlignment="Left" VerticalAlignment="Top"  
+                SelectionChanged="IntellisenseBox_OnSelectionChanged"
+                 
+                  />
+    </Grid>
+    <script:ScriptEditor  x:Name="Editor"/>
+        </Grid>
+</Window>

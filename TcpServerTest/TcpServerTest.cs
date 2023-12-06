@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using Bee.Core.Connect.TcpServer;
 using Microsoft.VisualBasic;
 
 namespace TcpServerTest
@@ -11,7 +12,7 @@ namespace TcpServerTest
 
         public class internalS : IAnalysisReceived
         {
-            public Task AnalysisReceived(BlockingCollection<byte[]>msgQueue, CancellationTokenSource cts)
+            public Task AnalysisReceived(BlockingCollection<byte[]?> msgQueue, CancellationTokenSource cts)
             {
                 return Task.CompletedTask;
             }

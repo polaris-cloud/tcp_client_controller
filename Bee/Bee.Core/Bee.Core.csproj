@@ -4,8 +4,20 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="DataSource\**" />
+    <EmbeddedResource Remove="DataSource\**" />
+    <None Remove="DataSource\**" />
+    <Page Remove="DataSource\**" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Gu.Localization" Version="6.7.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Prism.Wpf" Version="8.1.97" />
   </ItemGroup>
+	<ItemGroup>
+		<InternalsVisibleTo Include="Bee.Module.Script.ProtocolParser" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Connect\SerialPort\" />
+	</ItemGroup>
 </Project>

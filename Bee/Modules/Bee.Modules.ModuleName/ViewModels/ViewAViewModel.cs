@@ -3,7 +3,7 @@ using Bee.Services.Interfaces;
 using Prism.Commands;
 using Prism.Regions;
 
-namespace Bee.Modules.ModuleName.ViewModels
+namespace Bee.Modules.Script.ViewModels
 {
     public class ViewAViewModel : RegionViewModelBase
     {
@@ -21,8 +21,8 @@ namespace Bee.Modules.ModuleName.ViewModels
             NavigateCommand = new DelegateCommand<string>(Navigate);
         }
 
-  
-        
+
+
         private void Navigate(string navigatePath)
         {
             if (navigatePath != null)
@@ -32,7 +32,7 @@ namespace Bee.Modules.ModuleName.ViewModels
         public override void OnNavigatedTo(NavigationContext navigationContext)
         {
             //do something
-            
+
         }
     }
 }

@@ -1,10 +1,11 @@
-﻿using Bee.Modules.ModuleName;
+﻿using Bee.Modules.Script;
 using Bee.Services;
 using Bee.Services.Interfaces;
 using Bee.Views;
 using Prism.Ioc;
 using Prism.Modularity;
 using System.Windows;
+using Unity;
 
 namespace Bee
 {
@@ -26,7 +27,6 @@ namespace Bee
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
         {
             moduleCatalog.AddModule<ModuleNameModule>();
-            
         }
     }
 }

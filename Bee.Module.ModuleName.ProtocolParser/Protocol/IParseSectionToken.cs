@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using NuGet.Frameworks;
+using Bee.Module.ModuleName.ProtocolParser.Protocol.Model;
 
 namespace Bee.Module.ModuleName.ProtocolParser.Protocol
 {
@@ -11,7 +11,7 @@ namespace Bee.Module.ModuleName.ProtocolParser.Protocol
     internal interface IParseSectionToken
     {
 
-         bool IsRuntimeImportValue { get; }
-         void Parse(FrameSectionToken token); 
+        bool IsRuntimeImportValue { get; }
+        void Parse(FrameSectionToken token);
     }
 }

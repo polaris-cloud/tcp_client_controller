@@ -75,7 +75,7 @@ namespace ScriptEditorTest.ScriptConsole
             ComWrapper wrapper = new ComWrapper(new TcpServer());
             
              Console.ConsoleBridge.SwitchStream(wrapper);
-             wrapper.Start();
+            wrapper.Start();
              
              //wrapper.StartProcess("cmd.exe");
         }

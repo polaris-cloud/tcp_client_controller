@@ -10,7 +10,9 @@
     <Grid>
         <Grid Visibility="Collapsed">
         <RichTextBox Name="scriptEditor" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
-                      PreviewTextInput="ScriptEditor_PreviewTextInput">
+                      PreviewTextInput="ScriptEditor_PreviewTextInput"
+                     
+                      >
             <RichTextBox.ContextMenu>
                 <ContextMenu>
                     <!--<MenuItem Header="Insert Command" Click="InsertCommand_Click"/>-->
@@ -23,6 +25,9 @@
                  
                   />
     </Grid>
-    <script:ScriptEditor  x:Name="Editor"/>
+    <script:ScriptEditor  x:Name="Editor"
+                          FontSize="15"
+                          FontWeight="Black"
+                          />
         </Grid>
 </Window>

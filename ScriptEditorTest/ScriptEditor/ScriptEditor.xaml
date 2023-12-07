@@ -8,7 +8,11 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <RichTextBox Name="Editor" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
-                     PreviewTextInput="ScriptEditor_PreviewTextInput">
+                     PreviewTextInput="ScriptEditor_PreviewTextInput"
+                     FontFamily="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ScriptEditor}}, Path=FontFamily}"
+                     Background="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ScriptEditor}}, Path=Background}"
+                     FontSize="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ScriptEditor}}, Path=FontSize}"
+                     >
             <RichTextBox.ContextMenu>
                 <ContextMenu>
                     <!--<MenuItem Header="Insert Command" Click="InsertCommand_Click"/>-->
@@ -18,7 +22,7 @@
         </RichTextBox>
         <ListBox Name="IntellisenseBox"  HorizontalAlignment="Left" VerticalAlignment="Top"  
                  SelectionChanged="IntellisenseBox_OnSelectionChanged"
-             
+              
         />
     </Grid>
 </UserControl>

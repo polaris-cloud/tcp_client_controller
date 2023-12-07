@@ -266,15 +266,18 @@ private static readonly DependencyProperty ConsoleBridgeProperty = ConsoleBridge
             if (e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.Up || e.Key == Key.Down ||
                 e.Key == Key.C && Keyboard.Modifiers.HasFlag(ModifierKeys.Control)) return;
 
+            
+            
             //Input allowed?
             //Backspace needs to prevent +1 character after the read only zone
             if (inReadOnlyZone || !IsInputEnabled || e.Key == Key.Back && delta <= 0)
             {
-                
                 e.Handled = true;
                 return;
             }
 
+
+            
             //If not Return key, just let WPF process it
             if (e.Key != Key.Return) return;
 
@@ -302,6 +305,7 @@ private static readonly DependencyProperty ConsoleBridgeProperty = ConsoleBridge
         
         #region Core方法
 
+        private string _preInput; 
 
         /// <summary>
         /// Writes the input to the console control.
@@ -331,8 +335,14 @@ private static readonly DependencyProperty ConsoleBridgeProperty = ConsoleBridge
                     //update command buffer
                     if (!string.IsNullOrEmpty(input))
                     {
-                        _commandBuffer.Add(input);
-                        _commandBufferIndex = _commandBuffer.Count;
+                        if (_preInput != input)
+                        {
+                            _commandBuffer.Add(input);
+                            _commandBufferIndex = _commandBuffer.Count;
+                            _preInput = input;
+                        }
+
+                        
                     }
 
                     // Raise the input event.
@@ -372,7 +382,7 @@ private static readonly DependencyProperty ConsoleBridgeProperty = ConsoleBridge
                 //Set the start of the input zone
                 _inputStartPos = ContentRichTextBox.GetCaretPosition();
 
-                //Switch to input color
+                //Switch back to input color , 转换回输入
                 var _ = new Run("", ContentRichTextBox.CaretPosition) { Foreground = InputTextBrush };
                 
                 ContentRichTextBox.Selection.ApplyPropertyValue(TextElement.ForegroundProperty, InputTextBrush);

@@ -61,16 +61,17 @@ namespace Bee.Core.Connect.TcpServer
         /// </summary>
         /// <param name="ip"></param>
         /// <param name="port"></param>
+        /// <param name="cts"></param>
         /// <param name="isSyncTransRec"></param>
         /// <returns></returns>
         /// <exception cref="SocketException"> 重复连接</exception>
-        public async Task ListenTo(string ip, int port, bool isSyncTransRec = true)
+        public async Task ListenTo(string ip, int port, CancellationTokenSource cts,bool isSyncTransRec = true)
         {
             
             
             _listener = new TcpListener(IPAddress.Parse(ip), port);
 
-            _cts = new CancellationTokenSource();
+            _cts = cts;
             _connectingCts = new CancellationTokenSource();
             using (_msgQueue = new BlockingCollection<byte[]>())
             {
@@ -109,13 +110,15 @@ namespace Bee.Core.Connect.TcpServer
         ///</summary>
         /// <param name="ip"></param>
         /// <param name="port"></param>
-        /// <param name="milliseconds"></param>
+        /// <param name="cts"></param>
         /// <returns></returns>
         /// <exception cref="TaskCanceledException">连接超时抛出异常</exception>
-        public async Task ConnectTo(string ip, int port, int milliseconds=-1)
+        public async Task ListenTo(string ip, int port, CancellationTokenSource cts)
         {
+            if(_listener!=null)
+                _listener.Stop();
             _listener = new TcpListener(IPAddress.Parse(ip), port);
-            _cts = new CancellationTokenSource(milliseconds);
+            _cts = cts;
             _msgQueue = new BlockingCollection<byte[]>();
             _listener.Start();
             // 接受一个客户端连接
@@ -125,12 +128,48 @@ namespace Bee.Core.Connect.TcpServer
 
 
 
-        public void Close()
+        /// <summary>
+        /// 单次连接 
+        ///</summary>
+        /// <param name="ip"></param>
+        /// <param name="port"></param>
+        /// <param name="cts"></param>
+        /// <returns></returns>
+        /// <exception cref="TaskCanceledException">连接超时抛出异常</exception>
+        public  Task Listen(string ip, int port)
         {
-            _cts.Cancel();
+            if (_listener != null)
+                _listener.Stop();
+            _listener = new TcpListener(IPAddress.Parse(ip), port);
+            _msgQueue = new BlockingCollection<byte[]>();
+            _listener.Start();
+            // 接受一个客户端连接
+            return Task.CompletedTask;
+        }
+
+
+        /// <summary>
+        /// 连接
+        /// </summary>
+        /// <param name="cts"></param>
+        /// <returns></returns>
+        public async Task Connect(CancellationTokenSource cts)
+        {
+            if (_listener == null) throw new InvalidOperationException("未开始侦听");
+            if(_client!=null) _client.Close();//关闭当前
+            _client = await _listener.AcceptTcpClientAsync(cts.Token);
+            RaiseConnectionReceived(true, _client.Client.RemoteEndPoint, $"{_client.Client.RemoteEndPoint} 已连接");
+        }
+
+
+
+
+
+        public void CloseListen()
+        {
+            _listener.Stop();
             _msgQueue.Dispose();
             _connectingCts.Cancel();
-            
             //_continuousListening.SetResult();
         }
 

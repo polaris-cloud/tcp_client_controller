@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -39,7 +41,7 @@ namespace ScriptEditorTest.ScriptEditor
             InitializeComponent();
             IntellisenseBox.Visibility = Visibility.Collapsed;
             Editor.ContextMenu!.ItemsSource = SuggestionList;
-            Editor.Focus();
+
         }
 
         private void ShowIntellisense(TextPointer caretPosition, List<string> suggestions)
@@ -70,7 +72,7 @@ namespace ScriptEditorTest.ScriptEditor
                 IntellisenseBox.Margin = new Thickness(point.X, point.Y, 0, 0);
                 IntellisenseBox.Visibility = Visibility.Visible;
                 IntellisenseBox.SelectedIndex = -1;
-                
+                IntellisenseBox.Focus();
                 //Add a handler to insert the selected item
                 //IntellisenseBox.SelectionChanged += (s, e) =>
                 //{
@@ -110,10 +112,7 @@ namespace ScriptEditorTest.ScriptEditor
 
             }
         }
-
-
-
-
+        
         private void HideIntellisense()
         {
             //scriptEditor.RemoveChild(IntelliSenseBox);
@@ -134,36 +133,40 @@ namespace ScriptEditorTest.ScriptEditor
         {
             InsertTextAtCaret(">Command ");
         }
-
-
-
-        private static Panel? GetParentPanel(DependencyObject? element)
-        {
-            while (element != null && !(element is Panel))
-            {
-                element = VisualTreeHelper.GetParent(element);
-            }
-            return element as Panel;
-        }
-
+        
         private List<string> GetCommandSuggestions(string prefix)
         {
             return SuggestionList.Where(c => c.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)).ToList();
         }
-
-
+        
+        
+        
+        
         private void IntellisenseBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (IntellisenseBox.SelectedItem != null)
             {
                 var selectedText = IntellisenseBox.SelectedItem.ToString();
 
-                var caretPosition = Editor.CaretPosition;
-                InsertTextAtCaret(caretPosition, selectedText);
+                //var caretPosition = Editor.CaretPosition;
+                var range = new TextRange(Editor.GetEndPointer(), Editor.GetEndPointer())
+                {
+                    Text = selectedText
+                };
+
+                Debug.WriteLine($"pos:{range.Start.GetOffsetToPosition(Editor.Document.ContentStart)}");
+                Debug.WriteLine($"pos:{range.End.GetOffsetToPosition(Editor.Document.ContentStart)}");
+
+
+                range.ApplyPropertyValue(TextElement.ForegroundProperty, Brushes.DeepPink);
+                //InsertTextAtCaret(caretPosition, selectedText);
+                //Editor.ScrollToEnd();
                 Editor.SetCaretToEnd();
-                //TextPointer tp = caretPosition.GetPositionAtOffset(selectedText.Length + 1, LogicalDirection.Forward);
-                //if (tp != null)
-                //    Editor.CaretPosition = tp;
+                Debug.WriteLine($"pos:{range.End.GetOffsetToPosition(Editor.Document.ContentStart)}");
+                Debug.WriteLine($"pos:{Editor.CaretPosition.GetOffsetToPosition(Editor.Document.ContentStart)}");
+                var run = new Run("<===>") { Foreground =Brushes.Blue  };
+                range.End.Paragraph.Inlines.Add(run);
+                Editor.SetCaretToEnd();
                 HideIntellisense();
                 Editor.Focus();
             }
@@ -174,13 +177,11 @@ namespace ScriptEditorTest.ScriptEditor
             // Check if the current line starts with '>'
             var caretPosition = Editor.CaretPosition;
             var currentLine = /*GetLineText(caretPosition)*/e.Text;
-            if (currentLine.TrimStart().StartsWith("/"))
+            if (currentLine.TrimStart().StartsWith("."))
             {
                 // Extract the current command
-                var commandPrefix = currentLine.TrimStart('/', ' ');
+                var commandPrefix = currentLine.TrimStart('.', ' ');
                 var suggestions = GetCommandSuggestions(commandPrefix);
-
-                
                 
                 // Show IntelliSense ComboBox
                 ShowIntellisense(caretPosition, suggestions);
@@ -190,6 +191,55 @@ namespace ScriptEditorTest.ScriptEditor
             {
                 // Hide IntelliSense ComboBox
                 HideIntellisense();
+            }
+        }
+
+        private void SimulateMouseOver(ListBox listBox, int index)
+        {
+            if (index >= 0 && index < listBox.Items.Count)
+            {
+                ListBoxItem listBoxItem = (ListBoxItem)listBox.ItemContainerGenerator.ContainerFromIndex(index);
+                if (listBoxItem != null)
+                {
+                    VisualStateManager.GoToState(listBoxItem, "MouseOver", true);
+                }
+            }
+        }
+        private int _lookupPos = -1;
+        private void IntellisenseBox_OnKeyDown(object sender, KeyEventArgs e)
+        {
+            int cur = _lookupPos;
+            switch (e.Key)
+            {
+                case Key.Up:
+                {
+                    int next = cur <=0 ? cur : cur - 1;
+                    if (next > -1)
+                    {
+                            //var item = (ListBoxItem)IntellisenseBox.ItemContainerGenerator.ContainerFromItem(IntellisenseBox.Items[next]);
+                            //    ;
+                            //IntellisenseBox.ScrollIntoView(item);
+                            //item.Background = Brushes.Red; 
+                            SimulateMouseOver(IntellisenseBox, next);
+                    }
+                    
+                    e.Handled = true;
+                    break;
+                }
+                case Key.Down:
+                {
+                    int next = cur == IntellisenseBox.Items.Count-1 ? cur : cur +1;
+                    //var item =(ListBoxItem)IntellisenseBox.ItemContainerGenerator.ContainerFromItem(IntellisenseBox.Items[now]);
+                    //    IntellisenseBox.ScrollIntoView(item);
+                    //    item.Background = Brushes.Red;
+                        SimulateMouseOver(IntellisenseBox, next);
+                        e.Handled = true;
+                        break;
+                }
+                case Key.Enter:
+                    break; 
+                default: e.Handled = true;
+                    break;
             }
         }
     }

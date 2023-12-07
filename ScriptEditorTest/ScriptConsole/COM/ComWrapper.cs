@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Reflection.Metadata;
+using System.Security.RightsManagement;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -15,6 +16,7 @@ using Bee.Core.Connect.TcpServer;
 using Bee.Core.Protocol;
 using ScriptEditorTest.ScriptConsole.Stream;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using OperationCanceledException = System.OperationCanceledException;
 
 namespace ScriptEditorTest.ScriptConsole.COM
 {
@@ -50,6 +52,7 @@ _orderQueue=new Queue<string>();
             _dic = GenerateOrderDic();
             //_stream = new MemoryStream();
             _cts = new CancellationTokenSource();
+            _operationCts = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token);
             //_writer = new StreamWriter(_stream);
             //_reader =TextReader.Synchronized(new StreamReader(_stream));
             ReadFromStream(_cts);
@@ -82,7 +85,6 @@ _orderQueue=new Queue<string>();
 
 
         private delegate Task ComOperation(string[] orderAndParas);
-
         
 
         
@@ -91,18 +93,18 @@ _orderQueue=new Queue<string>();
         {
             return new Dictionary<string, ComOperation>()
             {
-                { "connect", Connect },
+                { "listen",Listen },
+                {"connect",_=>Connect()},
                 {"help",_=>GetHelp()},
-                {
-                    "test",_=>Test()
-                }
+                { "test",_=>Test()},
+                
             };
         }
 
 
         private readonly int _timeoutMilliseconds = 5000;
-
-        private async Task Connect(string[] info)
+        private CancellationTokenSource _operationCts; 
+        private async Task Listen(string[] info)
         {
 
             if (info.Length != 2)
@@ -111,21 +113,67 @@ _orderQueue=new Queue<string>();
                 return;
             }
 
-            
+            var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(_operationCts.Token); 
+            timeoutCts.CancelAfter(5000);
             try
             {
                 if (int.TryParse(info[1], out int value))
-                    await _com.ConnectTo(info[0], value, _timeoutMilliseconds);
+                {
+                    await _com.Listen(info[0], value/*,timeoutCts*/);
+                    RaiseConsoleRead(MessageRank.Diagnostic, $"开始侦听");
+                }
                 else
                     RaiseConsoleRead(MessageRank.Error, $"端口参数错误,Port:{info[1]}");
 
             }
             catch (TaskCanceledException e)
             {
-                RaiseConsoleRead(MessageRank.Diagnostic, $"连接超时,时间:{_timeoutMilliseconds}");
+                RaiseConsoleRead(MessageRank.Diagnostic, $"连接超时,Time:{_timeoutMilliseconds} ms");
+            }
+            catch (OperationCanceledException e)
+            {
+                if (!_operationCts.IsCancellationRequested)
+                    RaiseConsoleRead(MessageRank.Diagnostic, $"连接超时,Time:{_timeoutMilliseconds} ms");
+                else
+                    throw new TaskCanceledException();
+            }
+            catch (Exception e)
+            {
+                RaiseConsoleRead(MessageRank.Error, e.Message);
             }
 
         }
+
+        private async Task Connect()
+        {
+
+            
+
+            var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(_operationCts.Token);
+            timeoutCts.CancelAfter(5000);
+            try
+            {
+                
+                    await _com.Connect(timeoutCts);
+            }
+            catch (TaskCanceledException e)
+            {
+                RaiseConsoleRead(MessageRank.Diagnostic, $"连接超时,Time:{_timeoutMilliseconds} ms");
+            }
+            catch (OperationCanceledException e)
+            {
+                if (!_operationCts.IsCancellationRequested)
+                    RaiseConsoleRead(MessageRank.Diagnostic, $"连接超时,Time:{_timeoutMilliseconds} ms");
+                else
+                    throw new TaskCanceledException();
+            }
+            catch (Exception e)
+            {
+                RaiseConsoleRead(MessageRank.Error, e.Message);
+            }
+
+        }
+
 
         private Task GetHelp()
         {
@@ -138,8 +186,9 @@ _orderQueue=new Queue<string>();
 
         private async Task Test()
         {
-            await Task.Delay(1000);
-            await Task.Delay(5000);
+            
+                await Task.Delay(1000, _operationCts.Token);
+                await Task.Delay(5000, _operationCts.Token);
             Debug.WriteLine("commit once");
             RaiseConsoleRead(MessageRank.Diagnostic, "测试结束");
         }
@@ -168,8 +217,22 @@ _orderQueue=new Queue<string>();
         private async Task DoOperation(string[] info)
         {
             var op = _dic[info[0]];
-            await op(info.Skip(1).ToArray());
-            RaiseConsoleRead(MessageRank.None,"Bee Test>",false);
+            try
+            {
+                await op(info.Skip(1).ToArray());
+            }
+            catch (TaskCanceledException e)
+            {
+                RaiseConsoleRead(MessageRank.Diagnostic, "操作取消");
+            }
+            finally
+            {
+                _operationCts = new CancellationTokenSource(); 
+                RaiseConsoleRead(MessageRank.None, "Bee Test>", false);
+            }
+
+
+            
         }
 
         //private System.IO.Stream _stream=new System.IO.Stream;
@@ -219,6 +282,16 @@ _orderQueue=new Queue<string>();
         {
             //_writer.WriteLine(content);
             //_writer.Flush();
+
+
+            if (content.Contains( "p"))
+            {
+                _operationCts.Cancel();
+                 _dataReadyEvent.Reset();
+                 _dataProcessCompletedEvent.Set();
+                return false;
+            }
+
             if (_dataProcessCompletedEvent.WaitOne(0))
             {
                 _orderQueue.Enqueue(content);

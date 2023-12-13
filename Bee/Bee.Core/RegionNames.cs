@@ -1,7 +1,11 @@
-﻿namespace Bee.Core
+﻿using System.Diagnostics;
+
+namespace Bee.Core
 {
     public static class RegionNames
     {
-        public const string ContentRegion = "ContentRegion";
+        public static string ContentRegion = Properties.Resources.ContentRegion;
+        public static string ConsoleRegion = Properties.Resources.ConsoleModuleRegion;
+        public static string ScriptRegion = Properties.Resources.ScriptModuleRegion;
     }
 }

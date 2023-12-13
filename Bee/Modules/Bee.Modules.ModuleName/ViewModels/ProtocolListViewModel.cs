@@ -54,7 +54,7 @@ namespace Bee.Modules.Script.ViewModels
 
 
 
-            Protocols = new ObservableCollection<ProtocolFormatDao>(dao.Protocols);
+            Protocols = new ObservableCollection<ProtocolFormatDao>(dao.Protocols??new List<ProtocolFormatDao>());
             SelectedFormat = Protocols.FirstOrDefault();
 
 

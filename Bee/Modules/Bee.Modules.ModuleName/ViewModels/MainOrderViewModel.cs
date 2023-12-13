@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Reactive.Linq;
 using System.Reflection.Metadata;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Bee.Core.Connect.TcpServer;
 using Bee.Core.Protocol;
@@ -108,7 +109,7 @@ namespace Bee.Modules.Script.ViewModels
             {
                 if (string.IsNullOrEmpty(IP) || string.IsNullOrEmpty(Port))
                     return;
-                await _server.ListenTo(IP, Convert.ToInt32(Port));
+                await _server.Listen(IP, Convert.ToInt32(Port));
             }
             catch (TaskCanceledException e)
             {
@@ -122,7 +123,7 @@ namespace Bee.Modules.Script.ViewModels
         }
         private void Disconnect()
         {
-            _server.Close();
+            _server.CloseListen();
 
         }
 
@@ -160,7 +161,7 @@ namespace Bee.Modules.Script.ViewModels
             catch (Exception e)
             {
                 WriteLine(e.Message);
-                _server.Close();
+                _server.CloseListen();
             }
         }
 

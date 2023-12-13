@@ -1,0 +1,19 @@
+﻿<Window x:Class="rectangle_drag_test.lineMotion"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:rectangle_drag_test"
+        mc:Ignorable="d"
+        Title="lineMotion" Height="450" Width="800">
+    <Grid>
+        <Canvas Name="trackCanvas" Background="LightGray" Width="400" Height="50" Margin="10">
+            <!-- 直线导轨 -->
+            <Line X1="0" Y1="25" X2="400" Y2="25" Stroke="Black" StrokeThickness="2"/>
+
+            <!-- 小车 -->
+            <Rectangle x:Name="car" Width="20" Height="20" Fill="Blue" Canvas.Left="0" Canvas.Top="5" 
+                       MouseLeftButtonDown="Car_MouseLeftButtonDown" MouseMove="Car_MouseMove" MouseLeftButtonUp="Car_MouseLeftButtonUp"/>
+        </Canvas>
+    </Grid>
+</Window>

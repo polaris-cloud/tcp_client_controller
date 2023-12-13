@@ -1,4 +1,6 @@
 ﻿using System.Windows;
+using System.Windows.Data;
+using Polaris.MaterialDesignWindow.WPF.Resources;
 
 namespace Bee.Views
 {
@@ -9,7 +11,9 @@ namespace Bee.Views
     {
         public MainWindow()
         {
+            MaterialDesignWindow.RegisterCommands(this);
             InitializeComponent();
+            
         }
     }
 }

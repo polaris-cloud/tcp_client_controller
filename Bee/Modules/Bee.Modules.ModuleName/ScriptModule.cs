@@ -7,11 +7,11 @@ using Prism.Regions;
 
 namespace Bee.Modules.Script
 {
-    public class ModuleNameModule : IModule
+    public class ScriptModule : IModule
     {
         private readonly IRegionManager _regionManager;
 
-        public ModuleNameModule(IRegionManager regionManager)
+        public ScriptModule(IRegionManager regionManager)
         {
             _regionManager = regionManager;
         }
@@ -19,6 +19,8 @@ namespace Bee.Modules.Script
         public void OnInitialized(IContainerProvider containerProvider)
         {
             _regionManager.RequestNavigate(RegionNames.ContentRegion, "ViewA");
+            _regionManager.RegisterViewWithRegion(RegionNames.ScriptRegion, typeof(ViewA)); 
+            
         }
 
         public void RegisterTypes(IContainerRegistry containerRegistry)

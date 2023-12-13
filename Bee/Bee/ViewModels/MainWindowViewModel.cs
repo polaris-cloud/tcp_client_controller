@@ -1,5 +1,4 @@
 ﻿using Prism.Mvvm;
-
 namespace Bee.ViewModels
 {
     public class MainWindowViewModel : BindableBase
@@ -10,6 +9,8 @@ namespace Bee.ViewModels
             get { return _title; }
             set { SetProperty(ref _title, value); }
         }
+
+        
 
         public MainWindowViewModel()
         {

@@ -44,13 +44,13 @@ namespace ScriptEditorTest.ScriptConsole.Bridge
         public void SwitchStream(IConsoleStream stream)
         {
             if(_stream!=null)
-                _stream.OnConsoleRead -= RaiseConsoleReadEvent;
+                _stream.OnConsoleRead -= ConsoleReadHandler;
             _stream =stream;
-            _stream.OnConsoleRead += RaiseConsoleReadEvent;
+            _stream.OnConsoleRead += ConsoleReadHandler;
 
         }
 
-        public void RaiseConsoleReadEvent(object? sender, ConsoleStreamEventArgs args)
+        public void ConsoleReadHandler(object? sender, ConsoleStreamEventArgs args)
         {
             Brush brush=args.MessageRank  switch{
                 MessageRank.None=> Brushes.Black,

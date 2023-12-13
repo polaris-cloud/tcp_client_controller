@@ -25,17 +25,17 @@ namespace TcpServerTest
             server.MaxReceiveLength = 20;
             server.AnalysisStrategy = new internalS();
             //5秒后自动关闭
-            Task.Delay(5000).ContinueWith(t => server.Close());
+            Task.Delay(5000).ContinueWith(t => server.CloseListen());
             try
             {
-                await server.ListenTo("192.168.4.2",8088);
+                await server.ListenTo("192.168.4.2",8088,new ());
             }
             catch(Exception e)
             {
                 Debug.WriteLine(e.Message);
             }
 
-            await server.ListenTo("192.168.4.2", 8088);
+            await server.ListenTo("192.168.4.2", 8088,new());
 
 
         }

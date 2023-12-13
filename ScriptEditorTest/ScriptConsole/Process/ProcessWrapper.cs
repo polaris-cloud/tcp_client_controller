@@ -161,7 +161,12 @@ public class ProcessWrapper:IConsoleStream
         };
         _process.Exited += ProcessExitedHandler;
         //Start the process
+
+        //_process.OutputDataReceived += OutputDataReceivedHandler;
+        //_process.ErrorDataReceived += OutputErrorDataReceivedHandler;
         _process.Start();
+        //_process.BeginOutputReadLine();
+        //_process.BeginErrorReadLine();
 
         //Create readers and writers
         _inputWriter = _process.StandardInput;
@@ -171,7 +176,6 @@ public class ProcessWrapper:IConsoleStream
         // Run the workers that read output and error
         ReadOutput(_outputReader, false, _cts);
         ReadOutput(_errorReader, true, _cts);
-
 
 
         return true;
@@ -292,8 +296,18 @@ public class ProcessWrapper:IConsoleStream
 
     }
 
-    
-    
+    private void  OutputDataReceivedHandler(object sender, DataReceivedEventArgs e)
+    {
+                    RaiseProcessOutputEvent(MessageRank.None,e.Data+Environment.NewLine);
+    }
+
+    private void OutputErrorDataReceivedHandler(object sender, DataReceivedEventArgs e)
+    {
+        RaiseProcessOutputEvent(MessageRank.Error, e.Data+ Environment.NewLine);
+    }
+
+
+
     public bool  Write(string content)
     {
         WriteInternal(content);

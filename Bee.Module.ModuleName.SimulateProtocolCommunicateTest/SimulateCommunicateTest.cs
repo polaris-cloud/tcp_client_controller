@@ -27,14 +27,14 @@ namespace Bee.Module.Script.SimulateProtocolCommunicateTest
             var ar = protocolScriptParser.GenerateSendFrame("MoveOsc xÖá=1000 yÖá=1000 ÊÇ·ñÏìÓ¦=1", out string debugLine);
             Trace.WriteLine(debugLine);
             server = new TcpServer();
-            server.ListenTo("192.168.4.2", 8088);
+            server.ListenTo("192.168.4.2", 8088,new());
 
             Thread.Sleep(10000);
             byte[] response = await server.SendProtocolSyncReceive(ar, protocolScriptParser.ResponseFrameLength);
             var resString = ar.Select(a => a.ToString("X2"));
             Trace.WriteLine(string.Join(" ", resString));
             Trace.WriteLine(string.Join(" ", response.Select(a => a.ToString("X2"))));
-            server.Close();
+            server.CloseListen();
 
         }
     }

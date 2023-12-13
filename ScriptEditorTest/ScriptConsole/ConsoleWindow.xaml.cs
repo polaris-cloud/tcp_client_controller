@@ -70,14 +70,14 @@ namespace ScriptEditorTest.ScriptConsole
 
         private void Start_OnClick(object sender, RoutedEventArgs e)
         {
-            //ProcessWrapper wrapper=new ProcessWrapper();
+            ProcessWrapper wrapper=new ProcessWrapper();
 
-            ComWrapper wrapper = new ComWrapper(new TcpServer());
+            //ComWrapper wrapper = new ComWrapper(new TcpServer());
             
              Console.ConsoleBridge.SwitchStream(wrapper);
-            wrapper.Start();
+            //wrapper.Start();
              
-             //wrapper.StartProcess("cmd.exe");
+             wrapper.StartProcess("cmd.exe");
         }
 
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)

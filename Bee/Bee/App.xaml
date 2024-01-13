@@ -17,51 +17,29 @@
 
                 <!-- Material Design -->
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.PopupBox.xaml" />
 
                 <!-- Material Design: MahApps Compatibility -->
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.MahApps;component/Themes/MaterialDesignTheme.MahApps.Defaults.xaml"/>
                 <!--<ResourceDictionary Source="MDIX/MaterialDesignWindow.xaml"/>-->
                 <ResourceDictionary Source="pack://application:,,,/Polaris.MaterialDesignWindow.WPF;Component/resources/materialdesignwindow.xaml"/>
                 <!-- Material Design -->
-
+                
                 <!-- MahApps -->
                 <!--ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" /-->
                 <!--ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" /-->
                 <!-- Color theme -->
                 <materialDesign:CustomColorTheme BaseTheme="Light"
-                                       PrimaryColor="#6a777d"
-                                       SecondaryColor="Indigo" 
+                                       PrimaryColor="#007bb6"
+                                       SecondaryColor="#67719f" 
                                        ColorAdjustment="{materialDesign:ColorAdjustment}"   
                 />
             </ResourceDictionary.MergedDictionaries>
-            
-            <SolidColorBrush x:Key="PrimaryHueMidBrush" Color="#212121"/>
-            <SolidColorBrush x:Key="PrimaryHueDarkBrush" Color="#6a777d"/>
-            <SolidColorBrush x:Key="FileBrush" Color="#455a64" />
+            <!--<SolidColorBrush x:Key="PrimaryHueMidBrush" Color="#ffff"/>-->
+            <!--<SolidColorBrush x:Key="PrimaryHueLightBrush" Color="#3949ab"/>
+            <SolidColorBrush x:Key="PrimaryHueDarkBrush" Color="#6a777d"/>-->
+          
 
-            <Style TargetType="materialDesign:Snackbar" x:Key="AskMessageBar">
-                <Setter Property="IsActive" Value="{Binding IsMessageShow}" />
-                <Setter Property="Message" >
-                    <Setter.Value>
-                        <materialDesign:SnackbarMessage>
-                            <materialDesign:SnackbarMessage.Template>
-                                <ControlTemplate TargetType="materialDesign:SnackbarMessage" >
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock  Style="{StaticResource MaterialDesignBody2TextBlock}" Text="{Binding AskMessage}"  Margin="10"/>
-                                        <Button     Style="{StaticResource MaterialDesignFlatButton}" Content="确定"  Command="{Binding ConfirmCommand}"  />
-                                        <Button    Style="{StaticResource MaterialDesignFlatButton}" Content="取消"  Command="{Binding CancelCommand}"/>
-                                    </StackPanel>
-                                </ControlTemplate>
-
-                            </materialDesign:SnackbarMessage.Template>
-
-                        </materialDesign:SnackbarMessage>
-                    </Setter.Value>
-                </Setter>
-                <Setter Property="MessageQueue" Value="{Binding LocalMessageQueue}" />
-
-            </Style>
+        
 
         </ResourceDictionary>
     </Application.Resources>

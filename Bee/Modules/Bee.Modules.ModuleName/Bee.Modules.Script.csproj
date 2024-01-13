@@ -3,11 +3,16 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
+ 
   <ItemGroup>
+    <PackageReference Include="MaterialDesignThemes" Version="4.9.0" />
     <PackageReference Include="Prism.Wpf" Version="8.1.97" />
     <PackageReference Include="System.Reactive" Version="6.0.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Polaris.ConnectTool\Polaris.Connect.Tool.csproj" />
+    <ProjectReference Include="..\..\..\Polaris.Controls.WPF\Polaris.Controls.WPF.csproj" />
+    <ProjectReference Include="..\..\..\Polaris.Protocol\Polaris.Connect.Protocol.csproj" />
     <ProjectReference Include="..\..\Bee.Core\Bee.Core.csproj" />
     <ProjectReference Include="..\..\Services\Bee.Services.Interfaces\Bee.Services.Interfaces.csproj" />
   </ItemGroup>

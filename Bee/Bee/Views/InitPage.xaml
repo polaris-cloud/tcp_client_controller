@@ -1,0 +1,37 @@
+﻿<UserControl x:Class="Bee.Views.InitPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             prism:ViewModelLocator.AutoWireViewModel="True" 
+             xmlns:local="clr-namespace:Bee.Views"
+             xmlns:viewModels="clr-namespace:Bee.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             
+             d:DataContext="{d:DesignInstance viewModels:InitPageViewModel}"
+>
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml"/>
+              
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <DockPanel>
+        <ProgressBar
+             Height="20"
+             IsIndeterminate="True"
+             DockPanel.Dock="Bottom"
+        />
+        <DockPanel DockPanel.Dock="Top">
+            <Image 
+                Source="/Bee;component/Resources/newyear.jpg" />
+            <TextBlock Name="LogTextBlock"  Margin="5"/>
+        </DockPanel>
+    </DockPanel>
+</UserControl>

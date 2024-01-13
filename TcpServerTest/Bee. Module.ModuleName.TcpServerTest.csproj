@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Bee\Bee.Core\Bee.Core.csproj" />
+    <ProjectReference Include="..\Polaris.ConnectTool\Polaris.Connect.Tool.csproj" />
   </ItemGroup>
 
 </Project>

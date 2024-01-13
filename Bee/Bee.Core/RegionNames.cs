@@ -9,3 +9,4 @@ namespace Bee.Core
         public static string ScriptRegion = Properties.Resources.ScriptModuleRegion;
     }
 }
+

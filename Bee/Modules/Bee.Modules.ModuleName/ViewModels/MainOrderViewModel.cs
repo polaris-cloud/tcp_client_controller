@@ -8,12 +8,14 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Bee.Core.Connect.TcpServer;
-using Bee.Core.Protocol;
-using Bee.Core.Protocol.Model;
 using Bee.Modules.Script.Models;
+using Bee.Services.Interfaces;
 using Microsoft.Xaml.Behaviors.Media;
+using Polaris.Connect.Tool;
+using Polaris.Protocol.Model;
+using Polaris.Protocol.Parser;
 using Prism.Commands;
+using Prism.Ioc;
 using Prism.Mvvm;
 
 namespace Bee.Modules.Script.ViewModels
@@ -68,6 +70,8 @@ namespace Bee.Modules.Script.ViewModels
         public DelegateCommand SendCommand { get; private set; }
         public MainOrderViewModel(InstructionSetDao dao)
         {
+            
+            
             if (dao.Protocols == null)
                 dao.GetStorage();
             protocolFormats = dao.Protocols?.Select(t => new ProtocolFormat
@@ -81,12 +85,12 @@ namespace Bee.Modules.Script.ViewModels
                 ResponseFrameRule = t.ResponseFrameRule,
 
             }).ToDictionary(t => t.BehaviorKeyword, t => t);
-            _server.OnConnectionReceived += (s, e) =>
-            {
-                IsConnect = e.IsConnecting;
-                WriteLine(e.Message);
+            //_server.OnConnectionReceived += (s, e) =>
+            //{
+            //    IsConnect = e.IsConnecting;
+            //    WriteLine(e.Message);
 
-            };
+            //};
             ConnectCommand = new DelegateCommand(Connect);
             DisconnectCommand = new DelegateCommand(Disconnect);
             ParseCommand = new DelegateCommand(ProcessLine);
@@ -109,7 +113,7 @@ namespace Bee.Modules.Script.ViewModels
             {
                 if (string.IsNullOrEmpty(IP) || string.IsNullOrEmpty(Port))
                     return;
-                await _server.Listen(IP, Convert.ToInt32(Port));
+                //await _server.Listen(IP, Convert.ToInt32(Port));
             }
             catch (TaskCanceledException e)
             {
@@ -123,7 +127,7 @@ namespace Bee.Modules.Script.ViewModels
         }
         private void Disconnect()
         {
-            _server.CloseListen();
+            //_server.CloseListen();
 
         }
 
@@ -147,7 +151,7 @@ namespace Bee.Modules.Script.ViewModels
                         ProtocolScriptParser parser = ProtocolScriptParser.BuildScriptParser(format);
                         byte[] send = parser.GenerateSendFrame(instruction, out string debugLine);
                         WriteLine(debugLine);
-                        byte[] response = await _server.SendProtocolSyncReceive(send, parser.ResponseFrameLength);
+                        byte[] response =new byte[0]/* await _server.SendProtocolSyncReceive(send, parser.ResponseFrameLength,new CancellationToken())*/;
                         string responseDebugLine = parser.GenerateResponseDebugLine(response);
                         WriteLine(responseDebugLine);
                     }
@@ -161,7 +165,7 @@ namespace Bee.Modules.Script.ViewModels
             catch (Exception e)
             {
                 WriteLine(e.Message);
-                _server.CloseListen();
+                //_server.CloseListen();
             }
         }
 

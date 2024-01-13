@@ -5,10 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Bee.Core.Mvvm;
 
 namespace Bee.Modules.Console.ViewModels
 {
-    public class ViewAViewModel : BindableBase
+    public class ViewAViewModel : BindableBase,IRegisterAsModuleShell
     {
         private string _message;
         public string Message
@@ -19,7 +20,11 @@ namespace Bee.Modules.Console.ViewModels
 
         public ViewAViewModel()
         {
-            Message = "View A from your Prism Module";
+            Message = "View A ";
+            
         }
+
+        public string ShellIcon { get; } = "Console";
+        public string ShellHeader { get; } = "Console";
     }
 }

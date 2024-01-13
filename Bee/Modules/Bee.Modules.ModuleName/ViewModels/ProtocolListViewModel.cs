@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using Bee.Core.Json;
-using Bee.Core.Protocol.Model;
 using Prism.Mvvm;
 using Prism.Commands;
 using Bee.Modules.Script.Models;

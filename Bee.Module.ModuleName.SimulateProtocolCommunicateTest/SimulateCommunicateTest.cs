@@ -1,8 +1,9 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using Bee.Core.Connect.TcpServer;
-using Bee.Core.Protocol;
-using Bee.Core.Protocol.Model;
+using System.Text;
+using Polaris.Connect.Tool;
+using Polaris.Protocol.Model;
+using Polaris.Protocol.Parser;
 
 
 namespace Bee.Module.Script.SimulateProtocolCommunicateTest
@@ -27,15 +28,20 @@ namespace Bee.Module.Script.SimulateProtocolCommunicateTest
             var ar = protocolScriptParser.GenerateSendFrame("MoveOsc xÖá=1000 yÖá=1000 ÊÇ·ñÏìÓ¦=1", out string debugLine);
             Trace.WriteLine(debugLine);
             server = new TcpServer();
-            server.ListenTo("192.168.4.2", 8088,new());
-
-            Thread.Sleep(10000);
-            byte[] response = await server.SendProtocolSyncReceive(ar, protocolScriptParser.ResponseFrameLength);
+            await server.Connect("192.168.4.2", 8088,new CancellationToken());
+            
+            
+            server.WhenDataReceived += (s, d) =>
+            {
+                Trace.WriteLine(string.Join(" ", d.Data.ToArray().Select(a => a.ToString("X2"))));
+            };
+            
+            await server.WriteTo(server.ActiveClients.ToArray()[0],ar ,new CancellationToken());
             var resString = ar.Select(a => a.ToString("X2"));
             Trace.WriteLine(string.Join(" ", resString));
-            Trace.WriteLine(string.Join(" ", response.Select(a => a.ToString("X2"))));
-            server.CloseListen();
-
+            Thread.Sleep(5000);
+            server.DisconnectMore();
+            
         }
     }
 }

@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Bee\Bee.Core\Bee.Core.csproj" />
+    <ProjectReference Include="..\Polaris.Protocol\Polaris.Connect.Protocol.csproj" />
   </ItemGroup>
 
 </Project>

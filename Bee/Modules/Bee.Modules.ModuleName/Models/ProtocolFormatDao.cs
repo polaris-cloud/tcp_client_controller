@@ -4,8 +4,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Bee.Core.Protocol.enums;
 using Newtonsoft.Json;
+using Polaris.Protocol.enums;
 using Prism.Mvvm;
 
 namespace Bee.Modules.Script.Models

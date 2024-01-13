@@ -1,0 +1,122 @@
+﻿<UserControl x:Class="Bee.Modules.Script.Views.ModuleShell"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Bee.Modules.Script.Views"
+             xmlns:prism="http://prismlibrary.com/"     
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             xmlns:vm="clr-namespace:Bee.Modules.Script.ViewModels"
+             xmlns:moduleExtension="clr-namespace:Bee.Core.ModuleExtension;assembly=Bee.Core"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance vm:ModuleShellViewModel}"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.popupbox.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/Polaris.Controls.WPF;Component/Themes/Polaris.Theme.ListBox.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.button.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <DockPanel>
+        <DockPanel  DockPanel.Dock="Top"  LastChildFill="False">
+            <ListBox 
+                  Style="{StaticResource PolarisTheme.HorizontalNavigationListBox}"
+                  ItemsSource="{Binding Items}"
+                  Name="ListBox"
+                  Margin="8 2 8 2"
+                  SelectedIndex="0"
+                  SelectedItem="{Binding SelComViewTabItem, Mode=OneWayToSource}"
+         >
+
+                <ListBox.Resources>
+                    <DataTemplate DataType="{x:Type moduleExtension:ModuleSubViewTabItem}">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon
+                             HorizontalAlignment="Center"
+                             Kind="{Binding Icon}" 
+                             Margin="8 0"
+                             VerticalAlignment="Center"
+                         />
+                            <TextBlock
+                             Text="{Binding TabName}"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center"
+                             />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.Resources>
+            </ListBox>
+            <ToolBarTray  DockPanel.Dock="Right" Background="White"
+                      
+                       >
+                <ToolBar Background="White">
+                    <Button 
+                         
+                          Command="{Binding ModuleCommand.SaveCommand}"
+                         x:Name="SaveButton"
+                 >
+                        <materialDesign:PackIcon
+                         Kind="ContentSaveCogOutline" 
+                         Height="20"
+                         Width="20"/>
+                    </Button>
+                    <Separator/>
+                    <materialDesign:PopupBox DockPanel.Dock="Right" 
+                                          StaysOpen="True"
+                                          PlacementMode="BottomAndAlignRightEdges"
+                                          IsPopupOpen="{Binding IsOpenConfigBox}"
+    
+                 >
+                        <materialDesign:PopupBox.ToggleContent>
+                            <materialDesign:PackIcon Kind="CogOutline" 
+                                                  Height="20" Width="20"
+                                                  Foreground="{Binding RelativeSource={RelativeSource FindAncestor,
+        AncestorType={x:Type materialDesign:PopupBox}}, Path=Foreground}"                        />
+                        </materialDesign:PopupBox.ToggleContent>
+
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Top"
+                                    Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                                    Text="设置"  Margin ="5 0 5 20" 
+                                    Foreground="DarkCyan"
+                         />
+                            <CheckBox
+                             DockPanel.Dock="Top"
+                             Content="是否设置调试信息"
+                             FontSize="12"
+                             Margin="5"
+                             IsChecked="{Binding IsDebugMode }"
+                         />
+                            <StackPanel
+                             Margin="100 10 0 10"
+                             DockPanel.Dock="Top"
+                             Orientation="Horizontal"
+                             HorizontalAlignment="Right">
+                                <Button
+                                 Content="_配置"
+                                 FontSize="14"
+                                 Command="{Binding SaveSettingCommand}"
+                             />
+                                <Button
+                                 Content="_取消"
+                                 FontSize="14"
+                                 Command="{x:Static materialDesign:PopupBox.ClosePopupCommand}">
+                                </Button>
+                            </StackPanel>
+                        </DockPanel>
+                    </materialDesign:PopupBox>
+
+                </ToolBar>
+            </ToolBarTray>
+
+        </DockPanel>
+
+        <ContentControl  x:Name="Content" Content="{Binding ElementName=ListBox, Path=SelectedItem.View}"/>
+    </DockPanel>
+</UserControl>

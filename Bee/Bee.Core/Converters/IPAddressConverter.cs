@@ -15,6 +15,7 @@ namespace Bee.Core.Converters
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
             JsonSerializer serializer)
         {
+            
             if (reader == null)
                 return existingValue;
             return IPAddress.Parse((string)reader.Value);

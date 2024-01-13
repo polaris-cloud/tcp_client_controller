@@ -4,6 +4,13 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="MaterialDesignThemes" Version="4.9.0" />
     <PackageReference Include="Prism.Wpf" Version="8.1.97" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Bee\Bee.Core\Bee.Core.csproj" />
+    <ProjectReference Include="..\Bee\Services\Bee.Services.Interfaces\Bee.Services.Interfaces.csproj" />
+    <ProjectReference Include="..\Polaris.ConnectTool\Polaris.Connect.Tool.csproj" />
+    <ProjectReference Include="..\Polaris.Controls.WPF\Polaris.Controls.WPF.csproj" />
   </ItemGroup>
 </Project>

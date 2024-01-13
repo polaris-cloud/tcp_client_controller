@@ -1,12 +1,20 @@
 ﻿using Bee.Services.Interfaces;
+using MaterialDesignThemes.Wpf;
 
 namespace Bee.Services
 {
     public class MessageService : IMessageService
     {
-        public string GetMessage()
+        private readonly ISnackbarMessageQueue _messageQueue;
+
+        public MessageService(ISnackbarMessageQueue  messageQueue)
         {
-            return "Hello from the Message Service";
+            _messageQueue = messageQueue;
+        }
+
+        public void Notice(string message)
+        {
+            _messageQueue.Enqueue(message);
         }
     }
 }

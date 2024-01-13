@@ -4,7 +4,6 @@
         xmlns:prism="http://prismlibrary.com/"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:core="clr-namespace:Bee.Core;assembly=Bee.Core"
-        
         xmlns:resources="clr-namespace:Polaris.MaterialDesignWindow.WPF.Resources;assembly=Polaris.MaterialDesignWindow.WPF"
         xmlns:attachProperties="clr-namespace:Polaris.MaterialDesignWindow.WPF.AttachProperties;assembly=Polaris.MaterialDesignWindow.WPF"
         Style="{StaticResource MaterialDesignWindow}"
@@ -14,16 +13,41 @@
         attachProperties:WindowEx.ShowMinimizeButton="True"
         Title="{Binding Title}"
         prism:ViewModelLocator.AutoWireViewModel="True"
-        >
+        xmlns:local="clr-namespace:Bee.Views"
+        xmlns:system="clr-namespace:System;assembly=System.Runtime"
+        xmlns:moduleExtension="clr-namespace:Bee.Core.ModuleExtension;assembly=Bee.Core">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-            
+
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Button.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Shadows.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.PopupBox.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ToggleButton.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/Polaris.Controls.WPF;Component/Themes/Polaris.Theme.ListBox.xaml"/>
+                <!--<ResourceDictionary Source="pack://application:,,,/Polaris.Controls.WPF;Component/Themes/Polaris.Theme.MessageBar.xaml"/>-->
             </ResourceDictionary.MergedDictionaries>
+            <Style TargetType="{x:Type TabItem}"  BasedOn="{StaticResource MaterialDesignNavigationRailTabItem}"  x:Key="TabItemRegionStyle">
+                <Setter Property="Header" Value="{Binding DataContext.ShellHeader}">
+                    <!--<Setter.Value>
+                        
+                        --><!--<StackPanel>
+                            <materialDesign:PackIcon
+                                Width="24"
+                                Height="24"
+                                HorizontalAlignment="Center"
+                                Kind="{Binding DataContext.ShellIcon}" />
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                Text="{Binding DataContext.ShellHeader}" />
+                        </StackPanel>--><!--
+                    </Setter.Value>-->
+                    </Setter>
+            </Style>
+
+            
+
+
         </ResourceDictionary>
     </Window.Resources>
     <resources:MaterialDesignWindow.HeaderContent>
@@ -39,21 +63,88 @@
 x:Name="MenuToggleButton" /-->
             <TextBlock Text="{Binding Title, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" VerticalAlignment="Center" HorizontalAlignment="Left" 
                        Margin="16 0 0 0" FontSize="35"
-                       Foreground="{StaticResource FileBrush}"/>
-            <Button
-                Margin="16,0,0,0"
-                Command="{Binding ConnectCommand}"
+                        Name="TitleTbx"
+                       MouseEnter="TitleTbx_OnMouseEnter"
+                       MouseLeave="TitleTbx_OnMouseLeave"
+                       />
+            <TextBlock Text="{Binding Author}" VerticalAlignment="Center" HorizontalAlignment="Left" 
+                       Margin="16 0 0 0" FontSize="35"
+                       Visibility="Hidden"
+                       Foreground="{DynamicResource SecondaryHueMidBrush}"
+                       Name="AuthorTbx"/>
+            <Border BorderBrush="{Binding ElementName=TitleTbx ,Path=Foreground }" 
+                    Visibility="{Binding ElementName=OpStackPanel,Path=Visibility}"
+                    BorderThickness="1,0,1,0" Width="2" Margin="15,0"/>
+            <StackPanel  Margin="5" Visibility="Hidden"
+                         Name="OpStackPanel"
+                         >
+                <Button
                 materialDesign:ButtonProgressAssist.IsIndeterminate="True"
-                materialDesign:ButtonProgressAssist.IsIndicatorVisible="{Binding IsConnecting}"
-                Visibility="Collapsed"
                 Content="{materialDesign:PackIcon Kind=LanConnect, Size=24}"
             >
 
             </Button>
+            </StackPanel>
         </DockPanel>
     </resources:MaterialDesignWindow.HeaderContent>
-    <Grid>
-       
-        <ContentControl  prism:RegionManager.RegionName="{x:Static core:RegionNames.ContentRegion}"/>
-    </Grid>
+
+    <materialDesign:Transitioner x:Name="SwitchContentTransitioner">
+        <local:InitPage x:Name="InitPage" />
+        <materialDesign:TransitionerSlide OpeningEffect="{materialDesign:TransitionEffect SlideInFromRight, Duration=0:0:1.2}"   >
+            <!--<materialDesign:TransitionerSlide.OpeningEffects>
+                <materialDesign:TransitionEffect
+                    Kind="SlideInFromLeft"
+                    Duration="0:0:0.8" />
+                <materialDesign:TransitionEffect
+                    Kind="SlideInFromBottom"
+                    OffsetTime="0:0:0.15"
+                    Duration="0:0:0.8" />
+            </materialDesign:TransitionerSlide.OpeningEffects>-->
+            <materialDesign:DialogHost
+                SnackbarMessageQueue="{Binding ElementName=MainSnackBar,Path=MessageQueue}">
+                <DockPanel>
+                    <materialDesign:Card  materialDesign:ElevationAssist.Elevation="Dp2" Margin="5">
+                        <DockPanel>
+                            <Border  BorderThickness="0,0,1,0" 
+                                     BorderBrush="{DynamicResource MaterialDesignDivider}"
+                                     >
+                                <ListBox  Style="{StaticResource PolarisTheme.VerticalNavigationListBox}"
+                                      ItemsSource="{Binding ModuleItems}"
+                                      SelectedItem="{Binding  SelectedModuleItem}">
+                                <ListBox.Resources>
+                                    <DataTemplate DataType="{x:Type moduleExtension:ModuleNavigateTab}">
+                                        <StackPanel Orientation="Horizontal" >
+                                            <materialDesign:PackIcon
+                                                HorizontalAlignment="Center"
+                                                Kind="{Binding Icon}"
+                                                Margin="0 0 8 0"
+                                                VerticalAlignment="Center"
+                                            />
+                                            <TextBlock
+                                                Text="{Binding Name}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.Resources>
+                                </ListBox>
+                            </Border>
+                                    <Grid >
+                                        <ContentControl  prism:RegionManager.RegionName="{x:Static core:RegionNames.ContentRegion}"/>
+                                <!-- this is a  notice Bar -->
+                                    <materialDesign:Snackbar
+                                        Name="MainSnackBar" 
+                                        MessageQueue="{Binding MainSnackbarMessageQueue}" 
+                                    >
+                                    </materialDesign:Snackbar>
+                            </Grid>
+                        </DockPanel>
+                    </materialDesign:Card>
+                </DockPanel>
+            </materialDesign:DialogHost>
+        </materialDesign:TransitionerSlide>
+    </materialDesign:Transitioner>
+
+    
+    
+    
+    
 </Window>

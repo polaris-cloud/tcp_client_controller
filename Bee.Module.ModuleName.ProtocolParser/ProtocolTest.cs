@@ -1,9 +1,11 @@
 using System.Diagnostics;
+using System.Formats.Asn1;
 using System.Runtime.CompilerServices;
-using Bee.Core.Protocol;
-using Bee.Core.Protocol.enums;
-using Bee.Core.Protocol.Model;
-using Bee.Core.Protocol.Model.Section;
+using Polaris.Protocol.enums;
+using Polaris.Protocol.Model;
+using Polaris.Protocol.Model.Section;
+using Polaris.Protocol.Parser;
+
 
 namespace Bee.Module.Script.ProtocolParser
 {
@@ -35,6 +37,8 @@ namespace Bee.Module.Script.ProtocolParser
                 Trace.WriteLine($"{p.SectionName}| {p.Operator} |{p.Action}| {p.Length}");
             }
         }
+
+        
 
 
         //[TestMethod]

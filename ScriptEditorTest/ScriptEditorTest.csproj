@@ -14,7 +14,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Bee.Modules.Console\Bee.Modules.Console.csproj" />
     <ProjectReference Include="..\Bee\Bee.Core\Bee.Core.csproj" />
+    <ProjectReference Include="..\Polaris.ConnectTool\Polaris.Connect.Tool.csproj" />
+    <ProjectReference Include="..\Polaris.Console\Polaris.Console.csproj" />
   </ItemGroup>
 
 </Project>

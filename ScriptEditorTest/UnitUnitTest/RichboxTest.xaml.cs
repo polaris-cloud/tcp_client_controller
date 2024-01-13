@@ -12,7 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using ScriptEditorTest.Util;
+using ScriptEditorTest.UnitUnitTest.Util;
 using static System.Collections.Specialized.BitVector32;
 using Section = System.Windows.Documents.Section;
 

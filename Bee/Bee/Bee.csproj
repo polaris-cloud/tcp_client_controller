@@ -11,15 +11,23 @@
     <Page Remove="MDIX\**" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="Resources\newyear.jpg" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="MaterialDesignThemes.MahApps" Version="0.3.0" />
     <PackageReference Include="Polaris.MaterialDesignWindow.WPF" Version="1.0.0.1-preview" />
     <PackageReference Include="Prism.Unity" Version="8.1.97" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Bee.Modules.Communication\Bee.Modules.Communication.csproj" />
     <ProjectReference Include="..\..\Bee.Modules.Console\Bee.Modules.Console.csproj" />
+    <ProjectReference Include="..\..\Polaris.Controls.WPF\Polaris.Controls.WPF.csproj" />
     <ProjectReference Include="..\Bee.Core\Bee.Core.csproj" />
     <ProjectReference Include="..\Modules\Bee.Modules.ModuleName\Bee.Modules.Script.csproj" />
     <ProjectReference Include="..\Services\Bee.Services.Interfaces\Bee.Services.Interfaces.csproj" />
     <ProjectReference Include="..\Services\Bee.Services\Bee.Services.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\newyear.jpg" />
   </ItemGroup>
 </Project>

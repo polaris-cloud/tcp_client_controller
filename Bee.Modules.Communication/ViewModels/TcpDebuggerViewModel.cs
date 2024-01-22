@@ -113,7 +113,11 @@ public string SelClient
 }
 
 
-public string InputData { get; set; }
+public string InputData
+{
+    get => _inputData;
+    set => SetProperty(ref _inputData, value);
+}
 
 #region UI State
 
@@ -138,8 +142,9 @@ private FrameFormat _receiveFrameFormat;
 private string[] _connectClients;
 private string _selClient;
         private bool _isStillSending;
+        private string _inputData;
 
-#endregion
+        #endregion
 
 
         #region Commands ForXamlBinding  & relative methods
@@ -219,12 +224,7 @@ private string _selClient;
         
         
         #endregion
-
-
-
-
-
-
+        
         #region  core(others) &  bottom methods  尽量不涉及界面交互，只读取所需要的参数readonly dont write
         
         private readonly TcpServer _server;
@@ -338,10 +338,7 @@ private readonly CommunicationModuleSetting _communicationModuleSetting;
 
         #endregion
 
-
-
-
-
+        
         #region  IOutputDataReceived  & logMethods
 
         public event OutputDataReceived OnOutputReceivedData;
@@ -389,7 +386,6 @@ private readonly CommunicationModuleSetting _communicationModuleSetting;
         private bool _isActive;
         private bool _canOpenState;
         
-
 
         public bool IsActive
         {

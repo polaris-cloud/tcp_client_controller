@@ -1,0 +1,304 @@
+﻿<UserControl
+    x:Class="Bee.Modules.Script.Views.ScriptEditor"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:Bee.Core.Converters;assembly=Bee.Core"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:enums="clr-namespace:Polaris.Protocol.enums;assembly=Polaris.Connect.Protocol"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:model="clr-namespace:Polaris.Protocol.Model;assembly=Polaris.Connect.Protocol"
+    xmlns:prism="http://prismlibrary.com/"
+    xmlns:system="clr-namespace:System;assembly=System.Runtime"
+    xmlns:vm="clr-namespace:Bee.Modules.Script.ViewModels"
+    d:DataContext="{d:DesignInstance vm:ScriptEditorViewModel}"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    prism:ViewModelLocator.AutoWireViewModel="True"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.button.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.combobox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Polaris.Controls.WPF;Component/Themes/Polaris.Theme.ListBox.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <converters:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
+
+            <ObjectDataProvider
+                x:Key="ProtocolEncodeFormatEnum"
+                MethodName="GetValues"
+                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="enums:ProtocolEncodeFormat" />
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+
+            <ObjectDataProvider
+                x:Key="EndianEnum"
+                MethodName="GetValues"
+                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="enums:ProtocolEndian" />
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+            <DataTemplate x:Key="ProtocolFormatItem" DataType="{x:Type model:ProtocolFormat}">
+                <TextBlock Text="{Binding BehaviorKeyword}" />
+            </DataTemplate>
+
+
+            <DataTemplate x:Key="ProtocolEncodeFormatTemplate" DataType="{x:Type enums:ProtocolEncodeFormat}">
+                <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}, Mode=OneWay}" />
+            </DataTemplate>
+
+
+            <DataTemplate x:Key="ProtocolFormatTemplate" DataType="{x:Type model:ProtocolFormat}">
+                <DockPanel>
+                    <TextBlock
+                        Margin="2"
+                        DockPanel.Dock="Top"
+                        Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
+                        Text="格式设置:" />
+                    <DockPanel Dock="Top">
+                        <ComboBox
+                            Margin="20,2"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Top"
+                            materialDesign:HintAssist.Hint="协议帧内容格式"
+                            ItemTemplate="{StaticResource ProtocolEncodeFormatTemplate}"
+                            ItemsSource="{Binding Source={StaticResource ProtocolEncodeFormatEnum}}"
+                            SelectedItem="{Binding EncodeFormat}"
+                            Style="{StaticResource MaterialDesignFloatingHintComboBox}" />
+                        <ComboBox
+                            Margin="20,2"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Top"
+                            materialDesign:HintAssist.Hint="大小端格式"
+                            ItemTemplate="{StaticResource ProtocolEncodeFormatTemplate}"
+                            ItemsSource="{Binding Source={StaticResource EndianEnum}}"
+                            SelectedItem="{Binding ProtocolEndian}"
+                            Style="{StaticResource MaterialDesignFloatingHintComboBox}" />
+                    </DockPanel>
+                    <UniformGrid Rows="2">
+                        <DockPanel Dock="Top">
+                            <TextBlock
+                                Margin="2,15,2,2"
+                                DockPanel.Dock="Top"
+                                Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
+                                Text="发送帧设置:" />
+
+                            <TextBox
+                                materialDesign:HintAssist.Hint="发送帧描述"
+                                materialDesign:TextFieldAssist.DecorationVisibility="Collapsed"
+                                DockPanel.Dock="Top"
+                                FontSize="15"
+                                Style="{StaticResource MaterialDesignFilledTextBox}"
+                                Text="{Binding SendFrameDescription}" />
+                            <TextBox
+                                materialDesign:HintAssist.Hint="发送帧规则"
+                                AcceptsReturn="True"
+                                DockPanel.Dock="Top"
+                                FontSize="15"
+                                Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                Text="{Binding SendFrameRule}"
+                                TextWrapping="Wrap"
+                                VerticalScrollBarVisibility="Auto" />
+                        </DockPanel>
+                        <DockPanel Dock="Top">
+                            <TextBlock
+                                Margin="2,15,2,2"
+                                DockPanel.Dock="Top"
+                                Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
+                                Text="接收帧设置:" />
+
+                            <TextBox
+                                materialDesign:HintAssist.Hint="接收帧描述"
+                                materialDesign:TextFieldAssist.DecorationVisibility="Collapsed"
+                                DockPanel.Dock="Top"
+                                FontSize="15"
+                                Style="{StaticResource MaterialDesignFilledTextBox}"
+                                Text="{Binding ResponseFrameDescription}" />
+                            <TextBox
+                                materialDesign:HintAssist.Hint="接收帧规则"
+                                AcceptsReturn="True"
+                                DockPanel.Dock="Top"
+                                FontSize="15"
+                                Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                Text="{Binding ResponseFrameRule}"
+                                TextWrapping="Wrap"
+                                VerticalScrollBarVisibility="Auto" />
+                        </DockPanel>
+                    </UniformGrid>
+
+                </DockPanel>
+            </DataTemplate>
+
+        </ResourceDictionary>
+
+
+    </UserControl.Resources>
+
+
+    <DockPanel>
+        <DockPanel Dock="Top" LastChildFill="False">
+            <StackPanel DockPanel.Dock="Left" Orientation="Vertical">
+                <TextBlock
+                    Margin="15,5"
+                    VerticalAlignment="Center"
+                    DockPanel.Dock="Left"
+                    Style="{StaticResource MaterialDesignHeadline4TextBlock}"
+                    Text="指令集" />
+                <TextBlock
+                    Margin="20,5,0,10"
+                    VerticalAlignment="Center"
+                    DockPanel.Dock="Left"
+                    Foreground="Gray"
+                    Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                    Text="一组协议表示和编辑区域" />
+            </StackPanel>
+            <Button
+                Margin="5"
+                VerticalAlignment="Bottom"
+                Command="{Binding CreateInstructionSetCommand}"
+                DockPanel.Dock="Right"
+                Style="{StaticResource MaterialDesignRaisedSecondaryButton}">
+                <DockPanel>
+                    <TextBlock VerticalAlignment="Center" Text="Create" />
+                    <materialDesign:PackIcon
+                        Margin="8,0,8,0"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Kind="PlusCircleOutline" />
+                </DockPanel>
+            </Button>
+
+            <materialDesign:Badged
+                Margin="8,0,8,0"
+                VerticalAlignment="Bottom"
+                Badge="{Binding ModifyNum}"
+                DockPanel.Dock="Right">
+                <Button
+                    Margin="5"
+                    VerticalAlignment="Bottom"
+                    Command="{Binding SaveItemsCommand}"
+                    DockPanel.Dock="Right"
+                    Style="{StaticResource MaterialDesignRaisedSecondaryButton}">
+                    <DockPanel>
+                        <TextBlock VerticalAlignment="Center" Text="Save" />
+                        <materialDesign:PackIcon
+                            Margin="8,0,8,0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Kind="ContentSaveOutline" />
+                    </DockPanel>
+                </Button>
+            </materialDesign:Badged>
+            <Button
+                Margin="5"
+                VerticalAlignment="Bottom"
+                Command="{Binding OpenExistInstructionSetCommand}"
+                DockPanel.Dock="Right"
+                Style="{StaticResource MaterialDesignRaisedSecondaryButton}">
+                <DockPanel>
+                    <TextBlock VerticalAlignment="Center" Text="Open" />
+                    <materialDesign:PackIcon
+                        Margin="8,0,8,0"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Kind="FileSearchOutline" />
+                </DockPanel>
+            </Button>
+        </DockPanel>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.23*" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <GroupBox materialDesign:ColorZoneAssist.Mode="Standard">
+                <GroupBox.Header>
+                    <materialDesign:Badged
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Stretch"
+                        Badge="{materialDesign:PackIcon GiftOpenOutline}"
+                        BadgeColorZoneMode="SecondaryMid">
+                        <DockPanel>
+                            <Button
+                                Margin="10,-10"
+                                materialDesign:RippleAssist.IsDisabled="True"
+                                Command="{Binding CreateInstructionCommand}"
+                                DockPanel.Dock="Right"
+                                Style="{StaticResource MaterialDesignFlatSecondaryButton}">
+                                <materialDesign:PackIcon Kind="PlusCircleOutline" />
+                            </Button>
+                            <TextBlock
+                                Margin="2,0,0,0"
+                                Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                Text="{Binding InstructionName}"
+                                ToolTip="{Binding InstructionPath}" />
+
+                        </DockPanel>
+
+                    </materialDesign:Badged>
+                </GroupBox.Header>
+                <DockPanel>
+                    <DockPanel Dock="Top">
+                        <!--<materialDesign:Badged
+                                Badge="3"
+                                Margin="0,-37,5,0"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Bottom"
+                            >
+                                <Button DockPanel.Dock="Left"
+                                        Style="{StaticResource MaterialDesignFloatingActionMiniSecondaryButton}"
+                                >
+                                    <materialDesign:PackIcon
+                                        Kind="BellBadge" />
+                                </Button>
+                            </materialDesign:Badged>-->
+
+                    </DockPanel>
+                    <Grid>
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
+                            Text="No Instruction"
+                            Visibility="{Binding IsProtocolsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        <ListBox
+                            FontSize="12"
+                            ItemTemplate="{StaticResource ProtocolFormatItem}"
+                            ItemsSource="{Binding Protocols}"
+                            SelectedItem="{Binding SelectedProtocolFormat}"
+                            Style="{StaticResource PolarisTheme.VerticalListBox}" />
+                    </Grid>
+                </DockPanel>
+            </GroupBox>
+            <GroupBox
+                Grid.Column="1"
+                Margin="5,2"
+                Style="{StaticResource MaterialDesignCardGroupBox}">
+                <GroupBox.Header>
+                    <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                        <Button
+                            Margin="2,0"
+                            materialDesign:RippleAssist.IsDisabled="True"
+                            Command="{Binding DeleteInstructionCommand}"
+                            Foreground="White"
+                            Style="{StaticResource MaterialDesignFlatSecondaryButton}">
+                            <materialDesign:PackIcon Kind="DeleteOutline" />
+                        </Button>
+                        <TextBlock
+                            Margin="2,0,0,0"
+                            VerticalAlignment="Center"
+                            Foreground="White"
+                            Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                            Text="Editor" />
+                    </StackPanel>
+                </GroupBox.Header>
+                <ContentControl Content="{Binding SelectedProtocolFormat}" ContentTemplate="{StaticResource ProtocolFormatTemplate}" />
+            </GroupBox>
+        </Grid>
+    </DockPanel>
+
+</UserControl>

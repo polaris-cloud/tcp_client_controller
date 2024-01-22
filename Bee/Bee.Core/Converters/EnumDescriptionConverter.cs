@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
 using Bee.Core.Utils;
 
@@ -9,10 +10,15 @@ namespace Bee.Core.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var myEnum = (Enum)value;
-            if (myEnum == null) return null;
-            var display = myEnum.GetDisplay();
-            return !string.IsNullOrEmpty(display) ? display : myEnum.ToString();
+
+
+            if (value is Enum myEnum)
+            {
+                var display = myEnum.GetDisplay();
+                return !string.IsNullOrEmpty(display) ? display : myEnum.ToString();
+            }
+            return DependencyProperty.UnsetValue;
+            
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

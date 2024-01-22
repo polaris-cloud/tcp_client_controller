@@ -24,5 +24,6 @@ namespace Polaris.Protocol.Model
         public string SendFrameRule { get; set; }
         public string ResponseFrameRule { get; set; }
 
+        
     }
 }

@@ -26,7 +26,7 @@
             </ResourceDictionary.MergedDictionaries>
             <!--<SolidColorBrush x:Key="PrimaryHueMidBrush" Color="#3949ab"/>
             <SolidColorBrush x:Key="PrimaryHueLightBrush" Color="#3949ab"/>-->
-            <converters:SpecificEnumToBoolConverter x:Key="SpecificEnum"/>
+            <converters:EnumToBoolConverter x:Key="SpecificEnum"/>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>

@@ -9,6 +9,7 @@
              prism:ViewModelLocator.AutoWireViewModel="True"
              xmlns:vm="clr-namespace:Bee.Modules.Script.ViewModels"
              xmlns:moduleExtension="clr-namespace:Bee.Core.ModuleExtension;assembly=Bee.Core"
+             xmlns:shared="clr-namespace:Bee.Modules.Script.Shared" 
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance vm:ModuleShellViewModel}"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -27,11 +28,10 @@
         <DockPanel  DockPanel.Dock="Top"  LastChildFill="False">
             <ListBox 
                   Style="{StaticResource PolarisTheme.HorizontalNavigationListBox}"
-                  ItemsSource="{Binding Items}"
+                  ItemsSource="{Binding SubViewTabs}"
                   Name="ListBox"
                   Margin="8 2 8 2"
-                  SelectedIndex="0"
-                  SelectedItem="{Binding SelComViewTabItem, Mode=OneWayToSource}"
+                  SelectedItem="{Binding SelComViewTabItem}"
          >
 
                 <ListBox.Resources>
@@ -68,7 +68,7 @@
                     </Button>
                     <Separator/>
                     <materialDesign:PopupBox DockPanel.Dock="Right" 
-                                          StaysOpen="True"
+                                             StaysOpen="True"
                                           PlacementMode="BottomAndAlignRightEdges"
                                           IsPopupOpen="{Binding IsOpenConfigBox}"
     
@@ -86,13 +86,23 @@
                                     Text="设置"  Margin ="5 0 5 20" 
                                     Foreground="DarkCyan"
                          />
-                            <CheckBox
-                             DockPanel.Dock="Top"
-                             Content="是否设置调试信息"
-                             FontSize="12"
-                             Margin="5"
-                             IsChecked="{Binding IsDebugMode }"
-                         />
+                            <DockPanel   DockPanel.Dock="Top">
+                                <Button  Command="{Binding GetFolderPathCommand}" 
+                                         DockPanel.Dock="Right"
+                                >
+                                    <materialDesign:PackIcon
+                                        Kind="FolderOutline" />
+                                </Button>
+                                <TextBox
+                                    FontSize="12"
+                                    Margin="5"
+                                    Text="{Binding ScriptSavePath}"
+                                    HorizontalAlignment="Stretch"
+                                />
+                                
+                            </DockPanel>
+
+                           
                             <StackPanel
                              Margin="100 10 0 10"
                              DockPanel.Dock="Top"
@@ -117,6 +127,6 @@
 
         </DockPanel>
 
-        <ContentControl  x:Name="Content" Content="{Binding ElementName=ListBox, Path=SelectedItem.View}"/>
+        <ContentControl  x:Name="Content" prism:RegionManager.RegionName="{x:Static shared:ModuleUris.ContentRegion}" />
     </DockPanel>
 </UserControl>

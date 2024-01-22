@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net;
 
-namespace Bee.Core.Converters
+namespace Bee.Core.Json
 {
     public class IPEndPointConverter : JsonConverter
     {

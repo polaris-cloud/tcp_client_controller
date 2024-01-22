@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using System.Net;
 
 
-namespace Bee.Core.Converters
+namespace Bee.Core.Json
 {
     public class IPAddressConverter : JsonConverter
     {
@@ -15,7 +15,7 @@ namespace Bee.Core.Converters
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
             JsonSerializer serializer)
         {
-            
+
             if (reader == null)
                 return existingValue;
             return IPAddress.Parse((string)reader.Value);

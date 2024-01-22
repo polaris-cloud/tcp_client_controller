@@ -101,6 +101,8 @@ x:Name="MenuToggleButton" /-->
                     Duration="0:0:0.8" />
             </materialDesign:TransitionerSlide.OpeningEffects>-->
             <materialDesign:DialogHost
+                DialogContentUniformCornerRadius="20"
+                Identifier="{x:Static core:RegionNames.ContentRegion}"
                 SnackbarMessageQueue="{Binding ElementName=MainSnackBar,Path=MessageQueue}">
                 <DockPanel>
                     <materialDesign:Card  materialDesign:ElevationAssist.Elevation="Dp2" Margin="5">
@@ -110,7 +112,9 @@ x:Name="MenuToggleButton" /-->
                                      >
                                 <ListBox  Style="{StaticResource PolarisTheme.VerticalNavigationListBox}"
                                       ItemsSource="{Binding ModuleItems}"
-                                      SelectedItem="{Binding  SelectedModuleItem}">
+                                      SelectedItem="{Binding  SelectedModuleItem}"
+                                      
+                                      >
                                 <ListBox.Resources>
                                     <DataTemplate DataType="{x:Type moduleExtension:ModuleNavigateTab}">
                                         <StackPanel Orientation="Horizontal" >

@@ -39,8 +39,12 @@ public  Task WriteAsync(byte[] bytes, CancellationToken token) =>
         var bytes = Encoding.UTF8.GetBytes(content);
         return WriteAsync(bytes, token);
     }
-    
-    
+
+    protected void SetSingleStream(Stream stream)
+    {
+        _comStream = stream;
+    }
+
     protected void RaiseDataReceived(ComReceivedEventArg arg)
     {
         WhenDataReceived?.Invoke(this, arg);

@@ -9,12 +9,15 @@ namespace Bee.Modules.Script.Settings
 {
     internal class ModuleSetting: IAppData
     {
+        public string SavePath { get; set;  }
+
+
         public object Clone()
         {
             throw new NotImplementedException();
         }
 
-        public string SubDir { get; }
-        public string Contract { get; }
+        public string SubDir { get; } = "scr";
+        public string Contract { get; } = "mo"; 
     }
 }

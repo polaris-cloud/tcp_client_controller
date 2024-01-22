@@ -13,7 +13,7 @@ namespace Polaris.Connect.Tool
         Dictionary<string ,ICom> _comMappings;
 
         public EventHandler<ComMappingChangedEventArg>? ComMappingChanged; 
-
+public IEnumerable<string> ActiveComs=> _comMappings.Keys;
         public ComManager()
         {
             _comMappings= new Dictionary<string ,ICom>();
@@ -30,7 +30,7 @@ namespace Polaris.Connect.Tool
             _comMappings.Add(contract, com);
         }
 
-        public ICom GetComMapping(string contract)
+        public ICom GetComMapping(string? contract)
         {
             if (string.IsNullOrEmpty(contract))
                 throw new ArgumentNullException(nameof(contract));

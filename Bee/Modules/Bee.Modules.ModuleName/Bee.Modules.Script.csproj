@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
  
@@ -13,6 +13,7 @@
     <ProjectReference Include="..\..\..\Polaris.ConnectTool\Polaris.Connect.Tool.csproj" />
     <ProjectReference Include="..\..\..\Polaris.Controls.WPF\Polaris.Controls.WPF.csproj" />
     <ProjectReference Include="..\..\..\Polaris.Protocol\Polaris.Connect.Protocol.csproj" />
+    <ProjectReference Include="..\..\..\Polaris.Storage\Polaris.Storage.csproj" />
     <ProjectReference Include="..\..\Bee.Core\Bee.Core.csproj" />
     <ProjectReference Include="..\..\Services\Bee.Services.Interfaces\Bee.Services.Interfaces.csproj" />
   </ItemGroup>

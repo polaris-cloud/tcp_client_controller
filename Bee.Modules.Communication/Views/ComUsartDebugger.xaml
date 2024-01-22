@@ -54,7 +54,7 @@
                     </TextBox>
                 </Grid>
             </DataTemplate>
-            <converter:SpecificEnumToBoolConverter x:Key="SpecificEnum"/>
+            <converter:EnumToBoolConverter x:Key="SpecificEnum"/>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>

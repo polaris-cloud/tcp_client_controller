@@ -199,10 +199,7 @@ namespace Bee.Modules.Script.ViewModels
             InstructionSet = string.Join("\r\n", newLines);
         }
 
-
-
-
-
+        
 
         private void WriteLine(string message)
         {

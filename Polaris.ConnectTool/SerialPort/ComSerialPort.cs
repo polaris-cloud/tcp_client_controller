@@ -63,6 +63,7 @@ namespace Polaris.Connect.Tool.SerialPort
             _port.Open();
             _port.DiscardInBuffer();
             AddPort(portName);
+            SetSingleStream(_port.BaseStream);
                 StartReceiveTask(portName, _cts.Token);
             RaiseConnectChanged(new ComEventArg(ComState.Connect, $"Port: {portName}"));
         }

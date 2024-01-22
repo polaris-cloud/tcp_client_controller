@@ -6,18 +6,21 @@ namespace Bee.Core.Utils
 {
     public static class EnumExtension
     {
-        public static string GetDisplay<T>(this T value)
+        public static string GetDisplay<T>(this T value) where T : Enum
         {
-            var type = value.GetType();
-            FieldInfo field = type.GetField(System.Enum.GetName(type, value));
-            DisplayAttribute descAttr =
-                Attribute.GetCustomAttribute(field, typeof(DisplayAttribute)) as DisplayAttribute;
-            if (descAttr == null)
+            var field = value.GetType().GetField(value.ToString());
+
+            if (field == null)
             {
-                return value.ToString();
+                throw new ArgumentException($"Enum field not found for value {value}");
             }
 
-            return TranslationUtil.GetTranslate(descAttr.Name, descAttr.ResourceType);
+            if (Attribute.GetCustomAttribute(field, typeof(DisplayAttribute)) is DisplayAttribute descAttr)
+            {
+                return TranslationUtil.GetTranslate(descAttr.Name, descAttr.ResourceType);
+            }
+
+            return value.ToString();
         }
     }
 }

@@ -11,6 +11,7 @@ namespace Bee.Core.ModuleExtension
     {
         public string ItemName { get;  }
         public string Icon { get; }
+        public string NavigateUri { get; set;  }
 
         public ModuleSubViewTabItemAttribute(string itemName,string icon)
         {

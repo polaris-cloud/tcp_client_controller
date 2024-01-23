@@ -1,0 +1,51 @@
+﻿<UserControl x:Class="Bee.Modules.Script.Views.WaitLoadingDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             prism:ViewModelLocator.AutoWireViewModel="True">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.progressbar.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+
+    <StackPanel>
+        <materialDesign:ColorZone Mode="SecondaryMid">
+            <DockPanel Margin="5">
+                <TextBlock
+                    Margin="5"
+                    Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                    Text="Loading" />
+                <materialDesign:PackIcon
+                    Width="20"
+                    Height="20"
+                    Margin="40,5,10,5"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Kind="FileDownloadOutline" />
+            </DockPanel>
+        </materialDesign:ColorZone>
+        <ProgressBar Margin="16"
+                     HorizontalAlignment="Center"
+                     IsIndeterminate="True"
+                     Style="{StaticResource MaterialDesignCircularProgressBar}"
+                     Foreground="{StaticResource SecondaryHueLightBrush}"
+                     Value="0" />
+        <Button HorizontalAlignment="Center"
+                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                Content="Cancel"
+                IsCancel="True"
+                Style="{StaticResource MaterialDesignFlatSecondaryButton}" >
+            <Button.CommandParameter>
+                <system:Boolean>
+                    false
+                </system:Boolean>
+            </Button.CommandParameter>
+        </Button>
+    </StackPanel>
+</UserControl>

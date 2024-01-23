@@ -1,4 +1,5 @@
 ﻿using System.Windows.Controls;
+using Bee.Core.Controls;
 using Bee.Modules.Communication.Shared;
 
 namespace Bee.Modules.Communication.Views
@@ -12,10 +13,10 @@ namespace Bee.Modules.Communication.Views
         public TcpDebugger()
         {
             InitializeComponent();
-            ((IOutputDataReceived)DataContext).OnOutputReceivedData += (o, b) => ReceiveRichTextBoxUtil.WriteOutputToReceivedDataRegion(
+            ((IOutputDataOnRichTextBox)DataContext).OnOutputVariantData += (o, b) => ReceiveRichTextBoxUtil.WriteOutputToReceivedDataRegion(
                 ReceiveRichTextBox, Dispatcher, o, b);
 
-            ((IOutputDataReceived)DataContext).OnOutputEmpty += (o, b) => ReceiveRichTextBox.Document.Blocks.Clear();
+            ((IOutputDataOnRichTextBox)DataContext).OnOutputEmpty += (o, b) => ReceiveRichTextBox.Document.Blocks.Clear();
         }
     }
 }

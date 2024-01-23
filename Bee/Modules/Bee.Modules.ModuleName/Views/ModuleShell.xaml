@@ -1,123 +1,111 @@
-﻿<UserControl x:Class="Bee.Modules.Script.Views.ModuleShell"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Bee.Modules.Script.Views"
-             xmlns:prism="http://prismlibrary.com/"     
-             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             prism:ViewModelLocator.AutoWireViewModel="True"
-             xmlns:vm="clr-namespace:Bee.Modules.Script.ViewModels"
-             xmlns:moduleExtension="clr-namespace:Bee.Core.ModuleExtension;assembly=Bee.Core"
-             xmlns:shared="clr-namespace:Bee.Modules.Script.Shared" 
-             mc:Ignorable="d" 
-             d:DataContext="{d:DesignInstance vm:ModuleShellViewModel}"
-             d:DesignHeight="450" d:DesignWidth="800">
+﻿<UserControl
+    x:Class="Bee.Modules.Script.Views.ModuleShell"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Bee.Modules.Script.Views"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:moduleExtension="clr-namespace:Bee.Core.ModuleExtension;assembly=Bee.Core"
+    xmlns:prism="http://prismlibrary.com/"
+    xmlns:shared="clr-namespace:Bee.Modules.Script.Shared"
+    xmlns:vm="clr-namespace:Bee.Modules.Script.ViewModels"
+    d:DataContext="{d:DesignInstance vm:ModuleShellViewModel}"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    prism:ViewModelLocator.AutoWireViewModel="True"
+    mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.popupbox.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/Polaris.Controls.WPF;Component/Themes/Polaris.Theme.ListBox.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.button.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.popupbox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Polaris.Controls.WPF;Component/Themes/Polaris.Theme.ListBox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.button.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
 
     <DockPanel>
-        <DockPanel  DockPanel.Dock="Top"  LastChildFill="False">
-            <ListBox 
-                  Style="{StaticResource PolarisTheme.HorizontalNavigationListBox}"
-                  ItemsSource="{Binding SubViewTabs}"
-                  Name="ListBox"
-                  Margin="8 2 8 2"
-                  SelectedItem="{Binding SelComViewTabItem}"
-         >
+        <DockPanel DockPanel.Dock="Top" LastChildFill="False">
+            <ListBox
+                Name="ListBox"
+                Margin="8,2,8,2"
+                ItemsSource="{Binding SubViewTabs}"
+                SelectedItem="{Binding SelComViewTabItem}"
+                Style="{StaticResource PolarisTheme.HorizontalNavigationListBox}">
 
                 <ListBox.Resources>
                     <DataTemplate DataType="{x:Type moduleExtension:ModuleSubViewTabItem}">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon
-                             HorizontalAlignment="Center"
-                             Kind="{Binding Icon}" 
-                             Margin="8 0"
-                             VerticalAlignment="Center"
-                         />
+                                Margin="8,0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Kind="{Binding Icon}" />
                             <TextBlock
-                             Text="{Binding TabName}"
-                             HorizontalAlignment="Center"
-                             VerticalAlignment="Center"
-                             />
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Text="{Binding TabName}" />
                         </StackPanel>
                     </DataTemplate>
                 </ListBox.Resources>
             </ListBox>
-            <ToolBarTray  DockPanel.Dock="Right" Background="White"
-                      
-                       >
+            <ToolBarTray Background="White" DockPanel.Dock="Right">
                 <ToolBar Background="White">
-                    <Button 
-                         
-                          Command="{Binding ModuleCommand.SaveCommand}"
-                         x:Name="SaveButton"
-                 >
+                    <Button x:Name="SaveButton" Command="{Binding ModuleCommand.SaveCommand}">
                         <materialDesign:PackIcon
-                         Kind="ContentSaveCogOutline" 
-                         Height="20"
-                         Width="20"/>
+                            Width="20"
+                            Height="20"
+                            Kind="ContentSaveCogOutline" />
                     </Button>
-                    <Separator/>
-                    <materialDesign:PopupBox DockPanel.Dock="Right" 
-                                             StaysOpen="True"
-                                          PlacementMode="BottomAndAlignRightEdges"
-                                          IsPopupOpen="{Binding IsOpenConfigBox}"
-    
-                 >
+                    <Separator />
+                    <materialDesign:PopupBox
+                        DockPanel.Dock="Right"
+                        IsPopupOpen="{Binding IsOpenConfigBox}"
+                        PlacementMode="BottomAndAlignRightEdges"
+                        StaysOpen="True">
                         <materialDesign:PopupBox.ToggleContent>
-                            <materialDesign:PackIcon Kind="CogOutline" 
-                                                  Height="20" Width="20"
-                                                  Foreground="{Binding RelativeSource={RelativeSource FindAncestor,
-        AncestorType={x:Type materialDesign:PopupBox}}, Path=Foreground}"                        />
+                            <materialDesign:PackIcon
+                                Width="20"
+                                Height="20"
+                                Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type materialDesign:PopupBox}}, Path=Foreground}"
+                                Kind="CogOutline" />
                         </materialDesign:PopupBox.ToggleContent>
 
                         <DockPanel>
-                            <TextBlock DockPanel.Dock="Top"
-                                    Style="{StaticResource MaterialDesignHeadline6TextBlock}"
-                                    Text="设置"  Margin ="5 0 5 20" 
-                                    Foreground="DarkCyan"
-                         />
-                            <DockPanel   DockPanel.Dock="Top">
-                                <Button  Command="{Binding GetFolderPathCommand}" 
-                                         DockPanel.Dock="Right"
-                                >
-                                    <materialDesign:PackIcon
-                                        Kind="FolderOutline" />
+                            <TextBlock
+                                Margin="5,0,5,20"
+                                DockPanel.Dock="Top"
+                                Foreground="DarkCyan"
+                                Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                                Text="设置" />
+                            <DockPanel DockPanel.Dock="Top">
+                                <Button Command="{Binding GetFolderPathCommand}" DockPanel.Dock="Right">
+                                    <materialDesign:PackIcon Kind="FolderOutline" />
                                 </Button>
                                 <TextBox
-                                    FontSize="12"
                                     Margin="5"
-                                    Text="{Binding ScriptSavePath}"
                                     HorizontalAlignment="Stretch"
-                                />
-                                
+                                    FontSize="12"
+                                    Text="{Binding ScriptSavePath}" />
+
                             </DockPanel>
 
-                           
+
                             <StackPanel
-                             Margin="100 10 0 10"
-                             DockPanel.Dock="Top"
-                             Orientation="Horizontal"
-                             HorizontalAlignment="Right">
+                                Margin="100,10,0,10"
+                                HorizontalAlignment="Right"
+                                DockPanel.Dock="Top"
+                                Orientation="Horizontal">
                                 <Button
-                                 Content="_配置"
-                                 FontSize="14"
-                                 Command="{Binding SaveSettingCommand}"
-                             />
+                                    Command="{Binding SaveSettingCommand}"
+                                    Content="_配置"
+                                    FontSize="14" />
                                 <Button
-                                 Content="_取消"
-                                 FontSize="14"
-                                 Command="{x:Static materialDesign:PopupBox.ClosePopupCommand}">
-                                </Button>
+                                    Command="{x:Static materialDesign:PopupBox.ClosePopupCommand}"
+                                    Content="_取消"
+                                    FontSize="14" />
                             </StackPanel>
                         </DockPanel>
                     </materialDesign:PopupBox>
@@ -127,6 +115,6 @@
 
         </DockPanel>
 
-        <ContentControl  x:Name="Content" prism:RegionManager.RegionName="{x:Static shared:ModuleUris.ContentRegion}" />
+        <ContentControl x:Name="Content" prism:RegionManager.RegionName="{x:Static shared:ModuleUris.ContentRegion}" />
     </DockPanel>
 </UserControl>

@@ -23,13 +23,14 @@ using Polaris.Connect.Tool.SerialPort;
 using Prism;
 using Prism.Commands;
 using System.Reflection.Metadata;
+using Bee.Core.Controls;
 using Polaris.Connect.Tool;
 
 namespace Bee.Modules.Communication.ViewModels
 {
     
 
-    internal class ComUsartDebuggerViewModel:BindableBase,IOutputDataReceived, IActiveAware
+    internal class ComUsartDebuggerViewModel:BindableBase,IOutputDataOnRichTextBox, IActiveAware
     {
 
         private readonly ComSerialPort _comSerialPort;
@@ -204,7 +205,7 @@ public ComUsartDebuggerViewModel(
         }
 
 
-        public event OutputDataReceived OnOutputReceivedData;
+        public event OutputDataOnRichTbxHandler OnOutputVariantData;
         public event EventHandler OnOutputEmpty;
 
 
@@ -273,28 +274,28 @@ public ComUsartDebuggerViewModel(
                 EncodeUtil.ConvertBackUtf8String(arg.Data.ToArray());
             if (IsOutputAsLog)
             {
-                   OnOutputReceivedData?.Invoke($"[{DateTime.Now}]: ", Brushes.Brown);
-                OnOutputReceivedData?.Invoke(parsedContent +"\r", Brushes.Black);
+                   OnOutputVariantData?.Invoke($"[{DateTime.Now}]: ", Brushes.Brown);
+                OnOutputVariantData?.Invoke(parsedContent +"\r", Brushes.Black);
             }
             else
-                OnOutputReceivedData?.Invoke(parsedContent,Brushes.Black);
+                OnOutputVariantData?.Invoke(parsedContent,Brushes.Black);
         }
         private void RaiseLogOutput(string content)
         {
-            OnOutputReceivedData?.Invoke($"[{DateTime.Now}]: {content}\r", Brushes.Blue);
+            OnOutputVariantData?.Invoke($"[{DateTime.Now}]: {content}\r", Brushes.Blue);
         }
 
 
         private void RaiseErrorOutput(Exception e)
         {
             string content = _moduleSetting.IsDebugMode ? e.ToString() : e.Message;
-            OnOutputReceivedData?.Invoke($"[{DateTime.Now}](Rank:Error): {content}\r", Brushes.Red);
+            OnOutputVariantData?.Invoke($"[{DateTime.Now}](Rank:Error): {content}\r", Brushes.Red);
         }
 
         private void RaiseReceivedErrorOutput(ComErrorEventArg e)
         {
             string content = _moduleSetting.IsDebugMode ? e.Exception.ToString() : e.Exception.Message;
-            OnOutputReceivedData?.Invoke($"[{DateTime.Now}](Rank:Error): {e.Contract}: {e.Exception}\r", Brushes.Red);
+            OnOutputVariantData?.Invoke($"[{DateTime.Now}](Rank:Error): {e.Contract}: {e.Exception}\r", Brushes.Red);
         }
 
         private  void InitializeSetting(SerialPortDebuggerSetting debuggerSetting)

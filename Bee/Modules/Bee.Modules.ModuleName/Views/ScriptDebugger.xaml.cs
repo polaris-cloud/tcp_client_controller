@@ -1,4 +1,6 @@
-﻿using System.Windows.Controls;
+﻿using System.ComponentModel;
+using System.Windows.Controls;
+using Bee.Core.Controls;
 using Bee.Core.ModuleExtension;
 
 namespace Bee.Modules.Script.Views
@@ -12,6 +14,14 @@ namespace Bee.Modules.Script.Views
         public ScriptDebugger()
         {
             InitializeComponent();
+            ((IOutputDataOnRichTextBox)DataContext).OnOutputVariantData += (o, b) => ReceiveRichTextBox.WriteOutputData(Dispatcher, o, b);
+
+            ((IOutputDataOnRichTextBox)DataContext).OnOutputEmpty += (o, b) => ReceiveRichTextBox.Document.Blocks.Clear();
+        }
+
+        private void LayoutContent_OnClosing(object sender, CancelEventArgs e)
+        {
+            e.Cancel=false;
         }
     }
 }

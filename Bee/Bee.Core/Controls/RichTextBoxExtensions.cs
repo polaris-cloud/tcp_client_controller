@@ -1,5 +1,7 @@
 ﻿using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Media;
+using System.Windows.Threading;
 
 //  Notes: Many thanks to https://github.com/adamecr/RadProjectsExtension for this code!
 //  https://github.com/dwmkerr/consolecontrol/issues/25#issuecomment-437586440
@@ -57,5 +59,29 @@ namespace Bee.Core.Controls
         {
             richTextBox.CaretPosition = richTextBox.GetEndPointer();
         }
+
+
+ public  static void WriteOutputData(this RichTextBox richTextBox, Dispatcher owner, string output, Brush brush)
+        {
+
+            owner.RunOnUiDispatcher(() =>
+            {
+                //Write the output.
+                var range = new TextRange(
+                    richTextBox.GetEndPointer(),
+                    richTextBox.GetEndPointer())
+                {
+                    Text = output
+                };
+                
+                range.ApplyPropertyValue(TextElement.ForegroundProperty, brush);
+
+                //Get to the end
+                richTextBox.ScrollToEnd();
+                richTextBox.SetCaretToEnd();
+                //ContentRichTextBox.Focus();
+            });
+        }
+
     }
 }

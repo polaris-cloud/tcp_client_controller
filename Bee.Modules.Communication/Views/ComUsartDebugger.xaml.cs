@@ -18,10 +18,10 @@ namespace Bee.Modules.Communication.Views
         public ComUsartDebugger()
         {
             InitializeComponent();
-            ((IOutputDataReceived)DataContext).OnOutputReceivedData+=(o,b)=> ReceiveRichTextBoxUtil.WriteOutputToReceivedDataRegion(
+            ((IOutputDataOnRichTextBox)DataContext).OnOutputVariantData+=(o,b)=> ReceiveRichTextBoxUtil.WriteOutputToReceivedDataRegion(
                 ReceiveRichTextBox, Dispatcher,o,b);
 
-            ((IOutputDataReceived)DataContext).OnOutputEmpty += (o, b) => ReceiveRichTextBox.Document.Blocks.Clear();
+            ((IOutputDataOnRichTextBox)DataContext).OnOutputEmpty += (o, b) => ReceiveRichTextBox.Document.Blocks.Clear();
         }
 
         public static bool IsHexadecimal(string input)

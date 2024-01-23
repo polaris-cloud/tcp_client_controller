@@ -19,10 +19,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Polaris.Connect.Tool.Base;
 using System.Reflection.Metadata;
+using Bee.Core.Controls;
 
 namespace Bee.Modules.Communication.ViewModels
 {
-    public class TcpDebuggerViewModel : BindableBase,IOutputDataReceived,IActiveAware,IAppDataApply<TcpDebuggerSetting>
+    public class TcpDebuggerViewModel : BindableBase,IOutputDataOnRichTextBox,IActiveAware,IAppDataApply<TcpDebuggerSetting>
     {
         
 
@@ -339,9 +340,9 @@ private readonly CommunicationModuleSetting _communicationModuleSetting;
         #endregion
 
         
-        #region  IOutputDataReceived  & logMethods
+        #region  IOutputVariantData  & logMethods
 
-        public event OutputDataReceived OnOutputReceivedData;
+        public event OutputDataOnRichTbxHandler OnOutputVariantData;
         public event EventHandler OnOutputEmpty;
 
 
@@ -355,28 +356,28 @@ private readonly CommunicationModuleSetting _communicationModuleSetting;
                 EncodeUtil.ConvertBackUtf8String(args.Data.ToArray());
             if (IsOutputAsLog)
             {
-                OnOutputReceivedData?.Invoke($"[{DateTime.Now}]: ", Brushes.Brown);
-                OnOutputReceivedData?.Invoke(parsedContent + "\r", Brushes.Black);
+                OnOutputVariantData?.Invoke($"[{DateTime.Now}]: ", Brushes.Brown);
+                OnOutputVariantData?.Invoke(parsedContent + "\r", Brushes.Black);
             }
             else
-                OnOutputReceivedData?.Invoke(parsedContent, Brushes.Black);
+                OnOutputVariantData?.Invoke(parsedContent, Brushes.Black);
         }
         private void RaiseLogOutput(string content)
         {
-            OnOutputReceivedData?.Invoke($"[{DateTime.Now}]: {content}\r", Brushes.Blue);
+            OnOutputVariantData?.Invoke($"[{DateTime.Now}]: {content}\r", Brushes.Blue);
         }
         
         
         private void RaiseErrorOutput(Exception e)
         {
             string content = _communicationModuleSetting.IsDebugMode ? e.ToString() : e.Message;
-            OnOutputReceivedData?.Invoke($"[{DateTime.Now}](Rank:Error): {content}\r", Brushes.Red);
+            OnOutputVariantData?.Invoke($"[{DateTime.Now}](Rank:Error): {content}\r", Brushes.Red);
         }
 
         private void RaiseReceivedErrorOutput(ComErrorEventArg e)
         {
             string content = _communicationModuleSetting.IsDebugMode ? e.Exception.ToString() : e.Exception.Message;
-            OnOutputReceivedData?.Invoke($"[{DateTime.Now}](Rank:Error):{e.Contract} : {content}\r", Brushes.Red);
+            OnOutputVariantData?.Invoke($"[{DateTime.Now}](Rank:Error):{e.Contract} : {content}\r", Brushes.Red);
         }
 
         #endregion

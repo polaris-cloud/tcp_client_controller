@@ -1,4 +1,7 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 using Bee.Core.Controls;
 using Bee.Modules.Communication.Shared;
 
@@ -13,10 +16,46 @@ namespace Bee.Modules.Communication.Views
         public TcpDebugger()
         {
             InitializeComponent();
-            ((IOutputDataOnRichTextBox)DataContext).OnOutputVariantData += (o, b) => ReceiveRichTextBoxUtil.WriteOutputToReceivedDataRegion(
-                ReceiveRichTextBox, Dispatcher, o, b);
+            ((IEasyLoggingBindView)DataContext).OnLogData+=Log;
+            
+        }
 
-            ((IOutputDataOnRichTextBox)DataContext).OnOutputEmpty += (o, b) => ReceiveRichTextBox.Document.Blocks.Clear();
+        void Log(string content, LogLevel level)
+        {
+            Brush brush;
+            switch (level)
+            {
+                case LogLevel.Info:
+                    brush = Brushes.Black;
+                    break;
+                case LogLevel.Debug:
+                    brush = Brushes.Blue;
+                    break;
+                case LogLevel.Warn:
+                    brush = Brushes.Yellow;
+                    break;
+                case LogLevel.Error:
+                    brush = Brushes.Red;
+                    break;
+                case LogLevel.Fatal:
+                    brush = Brushes.Red;
+                    break;
+                case LogLevel.Other:
+                    brush = Brushes.Brown;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(level), level, null);
+            }
+
+            ReceiveRichTextBoxUtil.WriteOutputToReceivedDataRegion(
+                ReceiveRichTextBox, Dispatcher, content, brush);
+
+        }
+
+
+        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        {
+             ReceiveRichTextBox.Document.Blocks.Clear();
         }
     }
 }

@@ -23,7 +23,7 @@ using Bee.Core.Controls;
 
 namespace Bee.Modules.Communication.ViewModels
 {
-    public class TcpDebuggerViewModel : BindableBase,IOutputDataOnRichTextBox,IActiveAware,IAppDataApply<TcpDebuggerSetting>
+    public class TcpDebuggerViewModel : BindableBase,IEasyLoggingBindView,IActiveAware,IAppDataApply<TcpDebuggerSetting>
     {
         
 
@@ -342,7 +342,7 @@ private readonly CommunicationModuleSetting _communicationModuleSetting;
         
         #region  IOutputVariantData  & logMethods
 
-        public event OutputDataOnRichTbxHandler OnOutputVariantData;
+        public event LogHandler OnLogData;
         public event EventHandler OnOutputEmpty;
 
 
@@ -356,28 +356,28 @@ private readonly CommunicationModuleSetting _communicationModuleSetting;
                 EncodeUtil.ConvertBackUtf8String(args.Data.ToArray());
             if (IsOutputAsLog)
             {
-                OnOutputVariantData?.Invoke($"[{DateTime.Now}]: ", Brushes.Brown);
-                OnOutputVariantData?.Invoke(parsedContent + "\r", Brushes.Black);
+                OnLogData?.Invoke($"[{DateTime.Now}]: ", LogLevel.Other);
+                OnLogData?.Invoke(parsedContent + "\r",LogLevel.Info);
             }
             else
-                OnOutputVariantData?.Invoke(parsedContent, Brushes.Black);
+                OnLogData?.Invoke(parsedContent, LogLevel.Info);
         }
         private void RaiseLogOutput(string content)
         {
-            OnOutputVariantData?.Invoke($"[{DateTime.Now}]: {content}\r", Brushes.Blue);
+            OnLogData?.Invoke($"[{DateTime.Now}]: {content}\r", LogLevel.Debug);
         }
         
         
         private void RaiseErrorOutput(Exception e)
         {
             string content = _communicationModuleSetting.IsDebugMode ? e.ToString() : e.Message;
-            OnOutputVariantData?.Invoke($"[{DateTime.Now}](Rank:Error): {content}\r", Brushes.Red);
+            OnLogData?.Invoke($"[{DateTime.Now}](Rank:Error): {content}\r", LogLevel.Error);
         }
 
         private void RaiseReceivedErrorOutput(ComErrorEventArg e)
         {
             string content = _communicationModuleSetting.IsDebugMode ? e.Exception.ToString() : e.Exception.Message;
-            OnOutputVariantData?.Invoke($"[{DateTime.Now}](Rank:Error):{e.Contract} : {content}\r", Brushes.Red);
+            OnLogData?.Invoke($"[{DateTime.Now}](Rank:Error):{e.Contract} : {content}\r", LogLevel.Error);
         }
 
         #endregion

@@ -25,7 +25,14 @@ using Bee.Core.Controls;
 
 namespace Bee.Modules.Script.ViewModels
 {
-    public class ScriptDebuggerViewModel : BindableBase, INavigationAware, IOutputDataOnRichTextBox
+    public interface  ITransferProtocols
+    {
+    public event EventHandler<IEnumerable<string>> OnProtocolsChanged;
+    }
+
+
+
+    public class ScriptDebuggerViewModel : BindableBase, INavigationAware, IEasyLoggingBindView, ITransferProtocols
     {
 
         #region Fileds for xaml binding
@@ -65,6 +72,9 @@ namespace Bee.Modules.Script.ViewModels
             set => SetProperty(ref _instructionSets, value);
         }
 
+        
+        
+        
         #endregion
 
 
@@ -85,7 +95,20 @@ namespace Bee.Modules.Script.ViewModels
         private readonly ScopedAppDataSourceManager _scopedAppDataSourceManager;
         private readonly AskDialogHost _dialogHost;
         private ICom _com;
-        private List<ProtocolFormat> _protocolFormats;
+
+        public List<ProtocolFormat> ProtocolFormats
+        {
+            get => _protocolFormats;
+            set
+            {
+                _protocolFormats = value;
+                OnProtocolsChanged?.Invoke(this ,value.Select(p=>p.BehaviorKeyword));
+            }
+            
+        }
+        
+        
+
         private readonly ModuleSetting _moduleSetting;
         private readonly ScriptDebuggerSetting _scriptDebuggerSetting;
 
@@ -155,15 +178,15 @@ namespace Bee.Modules.Script.ViewModels
             
             }
         
-        private async Task LoadInstructionList(string[] instructionPaths, List<ProtocolFormat> protocolFormats,
+        private async Task LoadInstructionList(string[] instructionPaths,
             CancellationToken token)
         {
             if (instructionPaths == null)
                 return;
 
-            if (protocolFormats == null)
-                protocolFormats = new List<ProtocolFormat>();
-            else protocolFormats.Clear();
+            
+                var protocolFormats = new List<ProtocolFormat>();
+            
 
             var list = new List<string>();
             foreach (var path in instructionPaths)
@@ -171,21 +194,24 @@ namespace Bee.Modules.Script.ViewModels
                 var setting = await JsonFile.GetDataAsync<InstructionSetting>(path, token);
                 protocolFormats.AddRange(setting?.Protocols ?? Array.Empty<ProtocolFormat>());
                 list.Add(setting?.Name);
+                RaiseDebugOutput($"Load file :{setting?.Name}");
             }
 
             InstructionSets = list.ToArray();
+            ProtocolFormats = protocolFormats; 
         }
         
         
         private bool _initOnceFlag;
         private CancellationTokenSource _cts;
         private string[] _instructionSets;
+        private List<ProtocolFormat> _protocolFormats;
 
         private async Task WaitLoadingCore(CancellationToken token)
         {
             try
             {
-                await Task.WhenAll(Task.Delay(500,token), LoadInstructionList(_scriptDebuggerSetting.InstructionList, _protocolFormats, token)) ;
+                await Task.WhenAll(Task.Delay(500,token), LoadInstructionList(_scriptDebuggerSetting.InstructionList, token)) ;
                 
             }
             catch (Exception e)
@@ -199,7 +225,7 @@ private async Task WaitLoadInstruction()
 {
     _cts = new CancellationTokenSource();
     await _dialogHost.ShowLoadingDialog("Instructions...", WaitLoadingCore, _cts);
-    RaiseLogOutput("Loading Step Over");
+    RaiseDebugOutput("Loading Step Over");
         }
 
 private void BuildScript()
@@ -257,24 +283,28 @@ private void BuildScript()
         #endregion
         
         #region IOutputVariantData
-
-        public bool IsOutputAsLog { get; set; }
-        public event OutputDataOnRichTbxHandler OnOutputVariantData;
+        
+        public event LogHandler OnLogData;
         public event EventHandler OnOutputEmpty;
 
-        private void RaiseLogOutput(string content)
+        private void RaiseDebugOutput(string content)
         {
-            OnOutputVariantData?.Invoke($"[{DateTime.Now}]: {content}\r", Brushes.Blue);
+            OnLogData?.Invoke($"[{DateTime.Now}]: {content}\r", LogLevel.Debug);
         }
 
+        private void RaiseStandardOutput(string content)
+        {
+            OnLogData?.Invoke($"[{DateTime.Now}]: {content}\r", LogLevel.Info);
+        }
 
         private void RaiseErrorOutput(Exception e)
         {
-            OnOutputVariantData?.Invoke($"[{DateTime.Now}](Rank:Error): {e.Message}\r", Brushes.Red);
+            OnLogData?.Invoke($"[{DateTime.Now}](Rank:Error): {e.Message}\r", LogLevel.Error);
         }
 
         #endregion
 
+        public event EventHandler<IEnumerable<string>> OnProtocolsChanged;
     }
 
 }

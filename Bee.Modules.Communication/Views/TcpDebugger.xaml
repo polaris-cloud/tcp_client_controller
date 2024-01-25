@@ -169,7 +169,7 @@
                         <Button  Style="{StaticResource MaterialDesignToolForegroundButton}" DockPanel.Dock="Right"
                                  Margin="20 5"
                                  Foreground="White"
-                                 Command="{Binding EmptyReceivedCommand}"
+                                 Click="ButtonBase_OnClick"
                         >
                             <materialDesign:PackIcon
                                 Kind="DeleteSweep" 

@@ -237,6 +237,7 @@
                             Command="{Binding EmptyReceivedCommand}"
                             DockPanel.Dock="Right"
                             Foreground="White"
+                            Click="ButtonBase_OnClick"
                             Style="{StaticResource MaterialDesignToolForegroundButton}">
                             <materialDesign:PackIcon
                                 Width="25"

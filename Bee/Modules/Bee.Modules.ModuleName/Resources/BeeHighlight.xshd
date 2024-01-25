@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding ="utf-8" ?>
+<SyntaxDefinition name="BeeHighlight" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+	<!--设置颜色与文本风格，如粗体，背景色等-->
+	<Color name="Comment" foreground="#C6B1B1" exampleText="* comment"/>
+	<Color name="string" fontWeight="bold" foreground="#303f9f" exampleText="abc"/>
+	<Color name="digit" fontWeight="bold" foreground="#795548" exampleText="01234567789"/>
+	
+	<Color name="ParaName" fontWeight="bold" foreground="#00871f"/>
+	<Color name="ParaValue" fontWeight="bold" foreground="#e41e00"/>
+	
+	<!-- 主要的规则集 -->
+	<RuleSet>
+		<!--以//开头或者包裹在/*..*/中的文本使用Comment颜色-->
+		<Span color="Comment" begin="//" />
+		<Span color="Comment" multiline="true" begin="/\*" end="\*/" />
+
+		<Span color="string">
+			<Begin>"</Begin>
+			<End>"</End>
+			<!--可以定义规则子集-->
+			<RuleSet>
+				<Span begin="\\" end="." />
+			</RuleSet>
+		</Span>
+
+		
+		<Span color="ParaName">
+			<Begin>\b[\u4E00-\u9FA5A-Za-z0-9_]+(?==)</Begin>
+			<End></End>
+		</Span>
+
+		<Span color="ParaValue">
+			<Begin>(?&lt;==)\b[\u4E00-\u9FA5A-Za-z0-9_]+</Begin>
+			<End></End>
+		</Span>
+
+
+
+
+
+
+
+
+
+		<!--定义关键词-->
+		<Keywords fontWeight="bold" foreground="Blue">
+			<Word>if</Word>
+			<Word>else</Word>
+			<!-- ... -->
+		</Keywords>
+		
+		
+		<!-- 可以使用正则进行定义 -->
+		<Rule color="digit">
+			\b0[xX][0-9a-fA-F]+  # hex number
+			|    \b
+			(    \d+(\.[0-9]+)?   #number with optional floating point
+			|    \.[0-9]+         #or just starting with floating point
+			)
+			([eE][+-]?[0-9]+)? # optional exponent
+		</Rule>
+
+		<!-- string rule -->
+		<Rule color="string">
+			\b\w+\b
+		</Rule>
+		
+	</RuleSet>
+</SyntaxDefinition>

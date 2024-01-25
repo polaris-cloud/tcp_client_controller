@@ -30,7 +30,7 @@ namespace Bee.Modules.Communication.ViewModels
 {
     
 
-    internal class ComUsartDebuggerViewModel:BindableBase,IOutputDataOnRichTextBox, IActiveAware
+    internal class ComUsartDebuggerViewModel:BindableBase,IEasyLoggingBindView, IActiveAware
     {
 
         private readonly ComSerialPort _comSerialPort;
@@ -120,7 +120,7 @@ namespace Bee.Modules.Communication.ViewModels
         public DelegateCommand CloseCommand { get; } 
 public DelegateCommand RefreshPortCommand { get;}
 public DelegateCommand SaveCommand { get; }
-public DelegateCommand EmptyReceivedCommand { get; }
+//public DelegateCommand EmptyReceivedCommand { get; }
 public DelegateCommand EmptyInputCommand { get; }
 public DelegateCommand SendCommand { get; }
 
@@ -154,7 +154,7 @@ public ComUsartDebuggerViewModel(
             SaveCommand = new DelegateCommand(SaveSetting, CanSave).
                 ObservesProperty(() => SelectedDataBit).ObservesProperty(() => SelectedBaudRate);
 
-            EmptyReceivedCommand = new DelegateCommand(EmptyReceive); 
+            //EmptyReceivedCommand = new DelegateCommand(EmptyReceive); 
             EmptyInputCommand= new DelegateCommand(EmptyInput);
             SendCommand = new DelegateCommand(()=>SendMessage(InputData),()=>!CanOpenState && !IsStillSending).ObservesProperty(()=> CanOpenState).ObservesProperty(()=>IsStillSending);
             comModuleCommand.SaveCommand.RegisterCommand(SaveCommand);
@@ -205,7 +205,7 @@ public ComUsartDebuggerViewModel(
         }
 
 
-        public event OutputDataOnRichTbxHandler OnOutputVariantData;
+        public event LogHandler OnLogData;
         public event EventHandler OnOutputEmpty;
 
 
@@ -253,10 +253,10 @@ public ComUsartDebuggerViewModel(
             CanOpenState = true;
         }
 
-        private void EmptyReceive()
-        {
-            OnOutputEmpty?.Invoke(this,EventArgs.Empty);
-        }
+        //private void EmptyReceive()
+        //{
+        //    OnOutputEmpty?.Invoke(this,EventArgs.Empty);
+        //}
 
         private void EmptyInput()
         {
@@ -274,28 +274,28 @@ public ComUsartDebuggerViewModel(
                 EncodeUtil.ConvertBackUtf8String(arg.Data.ToArray());
             if (IsOutputAsLog)
             {
-                   OnOutputVariantData?.Invoke($"[{DateTime.Now}]: ", Brushes.Brown);
-                OnOutputVariantData?.Invoke(parsedContent +"\r", Brushes.Black);
+                   OnLogData?.Invoke($"[{DateTime.Now}]: ", LogLevel.Other);
+                OnLogData?.Invoke(parsedContent +"\r", LogLevel.Info);
             }
             else
-                OnOutputVariantData?.Invoke(parsedContent,Brushes.Black);
+                OnLogData?.Invoke(parsedContent,LogLevel.Info);
         }
         private void RaiseLogOutput(string content)
         {
-            OnOutputVariantData?.Invoke($"[{DateTime.Now}]: {content}\r", Brushes.Blue);
+            OnLogData?.Invoke($"[{DateTime.Now}]: {content}\r", LogLevel.Debug);
         }
 
 
         private void RaiseErrorOutput(Exception e)
         {
             string content = _moduleSetting.IsDebugMode ? e.ToString() : e.Message;
-            OnOutputVariantData?.Invoke($"[{DateTime.Now}](Rank:Error): {content}\r", Brushes.Red);
+            OnLogData?.Invoke($"[{DateTime.Now}](Rank:Error): {content}\r", LogLevel.Error);
         }
 
         private void RaiseReceivedErrorOutput(ComErrorEventArg e)
         {
             string content = _moduleSetting.IsDebugMode ? e.Exception.ToString() : e.Exception.Message;
-            OnOutputVariantData?.Invoke($"[{DateTime.Now}](Rank:Error): {e.Contract}: {e.Exception}\r", Brushes.Red);
+            OnLogData?.Invoke($"[{DateTime.Now}](Rank:Error): {e.Contract}: {e.Exception}\r",LogLevel.Error);
         }
 
         private  void InitializeSetting(SerialPortDebuggerSetting debuggerSetting)

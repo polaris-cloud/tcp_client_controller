@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Reflection.Metadata.Ecma335;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -18,11 +20,44 @@ namespace Bee.Modules.Communication.Views
         public ComUsartDebugger()
         {
             InitializeComponent();
-            ((IOutputDataOnRichTextBox)DataContext).OnOutputVariantData+=(o,b)=> ReceiveRichTextBoxUtil.WriteOutputToReceivedDataRegion(
-                ReceiveRichTextBox, Dispatcher,o,b);
-
-            ((IOutputDataOnRichTextBox)DataContext).OnOutputEmpty += (o, b) => ReceiveRichTextBox.Document.Blocks.Clear();
+            
+            ((IEasyLoggingBindView)DataContext).OnLogData += Log;
         }
+
+
+        void Log(string content, LogLevel level)
+        {
+            Brush brush;
+            switch (level)
+            {
+                case LogLevel.Info:
+                    brush = Brushes.Black; 
+                    break;
+                case LogLevel.Debug:
+                    brush = Brushes.Blue;
+                    break;
+                case LogLevel.Warn:
+                    brush = Brushes.Yellow;
+                    break;
+                case LogLevel.Error:
+                    brush = Brushes.Red;
+                    break;
+                case LogLevel.Fatal:
+                    brush = Brushes.Red;
+                    break;
+                case LogLevel.Other:
+                    brush = Brushes.Brown;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(level), level, null);
+            }
+
+            ReceiveRichTextBoxUtil.WriteOutputToReceivedDataRegion(
+                ReceiveRichTextBox, Dispatcher, content, brush);
+
+        }
+
+
 
         public static bool IsHexadecimal(string input)
         {
@@ -38,8 +73,11 @@ namespace Bee.Modules.Communication.Views
                 return false;
             }
         }
-        
-        
-        
+
+
+        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        {
+            ReceiveRichTextBox.Document.Blocks.Clear();
+        }
     }
 }

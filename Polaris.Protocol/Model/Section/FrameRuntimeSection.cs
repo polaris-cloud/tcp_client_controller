@@ -10,8 +10,8 @@ namespace Polaris.Protocol.Model.Section;
 internal class FrameRuntimeSection : FrameSectionBase
 {
 
-    private int? _lowerLimit;
-    private int? _upperLimit;
+    public int? LowerLimit { get; private set; }
+    public int? UpperLimit { get; private set; }
 
     private string[] _right;
 
@@ -31,8 +31,8 @@ internal class FrameRuntimeSection : FrameSectionBase
             string[] limits = value.Trim('(', ')').Split('/');
             if (limits?.Length != 2)
                 return;
-            _lowerLimit = Convert.ToInt32(limits[0]);
-            _upperLimit = Convert.ToInt32(limits[1]);
+            LowerLimit = Convert.ToInt32(limits[0]);
+            UpperLimit = Convert.ToInt32(limits[1]);
         }
         else if (format == ProtocolEncodeFormat.String)
             _right = value.Trim('(', ')').Split('/');
@@ -57,10 +57,10 @@ internal class FrameRuntimeSection : FrameSectionBase
     {
         if (_right != null)
             return _right.Contains(value);
-        if (_lowerLimit != null && _upperLimit != null)
+        if (LowerLimit != null && UpperLimit != null)
         {
             var num = Convert.ToInt32(value);
-            return num >= _lowerLimit && num <= _upperLimit;
+            return num >= LowerLimit && num <= UpperLimit;
         }
 
         return true;

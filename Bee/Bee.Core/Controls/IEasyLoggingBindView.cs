@@ -14,7 +14,8 @@ namespace Bee.Core.Controls
         Debug,
         Warn,
         Error,
-        Fatal, 
+        Fatal,
+        Empty,
         Other,
     }
 

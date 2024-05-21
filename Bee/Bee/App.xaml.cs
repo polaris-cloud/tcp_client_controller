@@ -26,10 +26,12 @@ namespace Bee
     /// </summary>
     public partial class App
     {
-        private MainWindow _mainWindow; 
+        private MainWindow _mainWindow;
+        private InitPage _initPage; 
         protected override Window CreateShell()
         {
             _mainWindow= Container.Resolve<MainWindow>(); //step1.1 ,包含在Initialize()中,生成mainwindow
+            _initPage=Container.Resolve<InitPage>();
             return MainWindow;
         }
 
@@ -38,17 +40,18 @@ namespace Bee
         {  
             // jump init page 
             _mainWindow.SwitchContentTransitioner.SelectedIndex = 0;
-            base.OnInitialized();  //step4
+            
             
             // load app data
             await InitializeAppData();
             
             //jump modules Page
-            _mainWindow.SwitchContentTransitioner.SelectedIndex = 1;
+            //_mainWindow.SwitchContentTransitioner.SelectedIndex = 1;
             
             // after app data loaded
             OnAppDataInitialized();
             
+            base.OnInitialized();  //step4  : show mainwindow
 
         }
 
@@ -67,33 +70,35 @@ namespace Bee
                         moduleEx.OnAppDataInitialized(Container as IContainerRegistry);
                         
                         
-                        // 是否使用IEventAggregator代替？ 
+                        // 是否使用 IEventAggregator代替？ 
                         mainVm!.CreateModuleTab(moduleEx);
                         mainVm.SelectFirst();
                     }
                 }
                 
             }
+            _initPage.Close();
             
-        }
+         }
 
         private async Task InitializeAppData()
         {
             var manager = Container.Resolve<ScopedAppDataSourceManager>();
-            var init = _mainWindow.InitPage;
-
+            //var init = _mainWindow.InitPage;
+            _initPage.Show();
             try
             {
                 manager.InitializeAppCache(AppDomain.CurrentDomain.BaseDirectory);
-                manager.WhenAppDataLoad += (s, e) => { init.LogTextBlock.Text += e + Environment.NewLine; };
+                manager.WhenAppDataLoad += (s, e) => { _initPage.LogTextBlock.Text += e + Environment.NewLine; };
                 await Task.WhenAll(Task.Delay(1000), manager.LoadFromDataSourceAsync());
-                
+
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                init.LogTextBlock.Text += $"Error: {e.Message+Environment.NewLine} ";
+                _initPage.LogTextBlock.Text += $"Error: {e.Message + Environment.NewLine} ";
             }
             await Task.Delay(1000);
+            
         }
 
         protected override void OnActivated(EventArgs e)
@@ -143,7 +148,6 @@ namespace Bee
             moduleCatalog.AddModule<CommunicationModule>();
             moduleCatalog.AddModule<ScriptModule>();
             moduleCatalog.AddModule<ConsoleModule>();
-            
         }
     }
 }

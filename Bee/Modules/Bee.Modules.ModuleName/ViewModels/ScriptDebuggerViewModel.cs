@@ -1,11 +1,9 @@
 ﻿using Prism.Commands;
 using Prism.Mvvm;
 using System;
-using System.CodeDom;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Configuration;
-using System.Data.Common;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,24 +15,27 @@ using Polaris.Protocol.Model;
 using Polaris.Storage.Json;
 using Polaris.Storage.WinSystem;
 using Prism.Regions;
-using System.Windows.Media;
-using MaterialDesignThemes.Wpf;
 using Exception = System.Exception;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using Bee.Core.Controls;
+using ICSharpCode.AvalonEdit.Document;
+using Polaris.Protocol.Parser;
+using Bee.Core.Utils;
+using Bee.Modules.Script.Shared.Advance;
 
 namespace Bee.Modules.Script.ViewModels
 {
-    public interface  ITransferProtocols
+
+
+    public class ProtocolBuildInfo
     {
-    public event EventHandler<IEnumerable<string>> OnProtocolsChanged;
+        public string DebugInfo;
+        public byte[] RealBytes;
+    public ProtocolScriptParser Parser;
     }
 
-
-
-    public class ScriptDebuggerViewModel : BindableBase, INavigationAware, IEasyLoggingBindView, ITransferProtocols
+    public class ScriptDebuggerViewModel : BindableBase, INavigationAware, IEasyLoggingBindView
     {
-
+        
         #region Fileds for xaml binding
 
         public ObservableCollection<string> ActiveComs
@@ -65,28 +66,68 @@ namespace Bee.Modules.Script.ViewModels
         private string[] _activePorts;
         private string _selectedCom;
         private string _selectedPort;
-
+        
+        
         public string[] InstructionSets
         {
             get => _instructionSets;
             set => SetProperty(ref _instructionSets, value);
         }
 
-        
-        
-        
+        public bool CanBuildFlag
+        {
+            get => _canBuildFlag;
+            set => SetProperty(ref _canBuildFlag, value);
+        }
+
         #endregion
 
 
         #region Commands for binding
 
+
         public DelegateCommand RefreshPortsCommand { get; }
         public DelegateCommand ImportInstructionSetCommand { get; }
-        public DelegateCommand BuildScriptCommand { get; }
+        public DelegateCommand<TextDocument> BuildScriptCommand { get; }
+        public DelegateCommand StopBuildScriptCommand { get; }
+        public DelegateCommand<TextDocument> RunScriptCommand { get; }
 
+        private async void BuildScriptMethod(TextDocument document)
+        {
+            try
+            {
+                CanBuildFlag = false;
+                await BuildScriptAsync(document);
+            }
+            catch (Exception e)
+            {
+                RaiseErrorOutput(e);
+            }
+            
+            CanBuildFlag=true;
+        }
+
+        private void StopBuildMethod()
+        {
+            StopBuildScript();
+            CanBuildFlag = true; 
+        }
+
+        private async void RunMethod(TextDocument document)
+        {
+            try
+            {
+                if (await BuildScriptAsync(document))
+                    await RunScripts();
+
+            }
+            catch (Exception e)
+            {
+                RaiseErrorOutput(e);
+            }
+        }
 
         #endregion
-
 
 
         #region core
@@ -99,13 +140,10 @@ namespace Bee.Modules.Script.ViewModels
         public List<ProtocolFormat> ProtocolFormats
         {
             get => _protocolFormats;
-            set
-            {
-                _protocolFormats = value;
-                OnProtocolsChanged?.Invoke(this ,value.Select(p=>p.BehaviorKeyword));
+            set =>SetProperty(ref _protocolFormats, value); 
             }
             
-        }
+        
         
         
 
@@ -122,7 +160,6 @@ namespace Bee.Modules.Script.ViewModels
                     break;
                 case MappingChangedState.Remove:
                     ActiveComs.Remove(e.Contract);
-
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -206,13 +243,15 @@ namespace Bee.Modules.Script.ViewModels
         private CancellationTokenSource _cts;
         private string[] _instructionSets;
         private List<ProtocolFormat> _protocolFormats;
+        private ProtocolBuildInfo[] _buildScripts;
+        private CancellationTokenSource _cancellationTokenSource;
+        private bool _canBuildFlag;
 
         private async Task WaitLoadingCore(CancellationToken token)
         {
             try
             {
                 await Task.WhenAll(Task.Delay(500,token), LoadInstructionList(_scriptDebuggerSetting.InstructionList, token)) ;
-                
             }
             catch (Exception e)
             {
@@ -228,14 +267,117 @@ private async Task WaitLoadInstruction()
     RaiseDebugOutput("Loading Step Over");
         }
 
-private void BuildScript()
+
+#region build Script methods
+
+
+        private IEnumerable<Tuple<int,string,ProtocolFormat>> GetAllInstructionsFrom(TextDocument document,IDictionary<string ,ProtocolFormat> dic)
 {
-     
+    
+    foreach (var line in document.Lines)
+    {
+        string lineText = document.GetText(line);
+        string orderHead = lineText.Split('>')[0];
+        if (!dic.TryGetValue(orderHead, out ProtocolFormat protocolFormat))
+        {
+            throw new ArgumentException($"Line {line.LineNumber} : Protocol Script Format Error");
+                }
+
+        yield return new Tuple<int ,string, ProtocolFormat>(line.LineNumber,lineText.Trim(),protocolFormat);
+    }
 }
 
+private  ProtocolBuildInfo ParseSingleProtocol(string complete, ProtocolFormat protocolFormat)
+{
+    
+        ProtocolScriptParser protocolScriptParser = ProtocolScriptParser.BuildScriptParser(protocolFormat);
+        var cache = protocolScriptParser.GenerateSendFrame(complete, out string debug);
+        //RaiseStandardOutput(debug);
+        return new ProtocolBuildInfo()
+        {
+            DebugInfo = debug ,
+            RealBytes = cache,
+    Parser= protocolScriptParser
+        };
+        
+}
+
+/// <summary>
+/// 
+/// </summary>
+/// <param name="document"></param>
+/// <returns></returns>
+/// <exception cref="ArgumentException"></exception>
+private async Task<bool> BuildScriptAsync(TextDocument document)
+{
+    
+    
+        if(string.IsNullOrEmpty(document.Text))
+              return false;
+        _cancellationTokenSource = new CancellationTokenSource();
+        // 获取当前document中的所有指令
+        var dic = ProtocolFormats.ToDictionary(p => p.BehaviorKeyword, p => p);
+        var protocolFormatsWithComplete = GetAllInstructionsFrom(document, dic).ToArray();
+        // 将所以指令并行解析为<key,byte[]>，此时的顺序打乱了
+        _buildScripts = new ProtocolBuildInfo[protocolFormatsWithComplete.Length];
+        bool[] errors = new bool[protocolFormatsWithComplete.Length]; 
+        await Parallel.ForAsync(0, _buildScripts.Length, _cancellationTokenSource.Token, async (index, token) =>
+        {
+            var p = protocolFormatsWithComplete[index];
+            // 顺序不变
+            try
+            {
+                _buildScripts[index] = await Task.Run(() => ParseSingleProtocol(p.Item2, p.Item3), token);
+            }
+            catch(Exception e)
+            {
+                RaiseErrorOutput($"Line {p.Item1} : Protocol Script Format Error \r {e.Message}");
+                errors[index] = true;
+            }
+            
+        });
+        var count = errors.Count(b => b);
+        RaiseDebugOutput($" Finished building project ,Error : {count}");
+                //根据指令的顺序进行重新排列（已经用数组实现）
+                return count ==0;
+}
+
+private void StopBuildScript()
+{
+    _cancellationTokenSource.Cancel();
+}
+        #endregion
+
+        #region  Run Script methods
 
 
-#endregion
+        private async Task RunScripts()
+        {
+            var control=AutoSynProtocolComQueueWrapper.BuildWrapper(_com);
+            var cts = new CancellationTokenSource();
+            foreach (var script in _buildScripts)
+            {
+                RaiseStandardOutput(script.DebugInfo);
+RaiseLogOutput(EncodeUtil.HexArrayToString(script.RealBytes, " "));
+                var receiveInfo= await control.Post(new ProtocolSendInfo {
+                    Connection = SelectedPort,
+                    Content = script.RealBytes,
+                    Timeout = 10, 
+                Parser=script.Parser
+                },cts.Token);
+                RaiseStandardOutput(receiveInfo.Debug);
+                RaiseLogOutput(receiveInfo.Raw);
+            }
+            control.Close();
+        }
+
+
+        #endregion
+
+
+
+
+        #endregion
 
 
 
@@ -255,6 +397,10 @@ private void BuildScript()
             _manager.ComMappingChanged += ManagerComMappingChanged;
             RefreshPortsCommand = new DelegateCommand(ManualRefreshActivePorts);
             ImportInstructionSetCommand = new DelegateCommand(ImportInstructionFiles);
+            BuildScriptCommand = new DelegateCommand<TextDocument>(BuildScriptMethod);
+            StopBuildScriptCommand=new DelegateCommand(StopBuildMethod);
+            RunScriptCommand = new DelegateCommand<TextDocument>(RunMethod);
+            CanBuildFlag = true;
         }
 
         #region  INavigationAware
@@ -281,11 +427,10 @@ private void BuildScript()
 
 
         #endregion
-        
-        #region IOutputVariantData
-        
+
+        #region IEasyLoggingBindView
+
         public event LogHandler OnLogData;
-        public event EventHandler OnOutputEmpty;
 
         private void RaiseDebugOutput(string content)
         {
@@ -296,15 +441,25 @@ private void BuildScript()
         {
             OnLogData?.Invoke($"[{DateTime.Now}]: {content}\r", LogLevel.Info);
         }
+        
 
         private void RaiseErrorOutput(Exception e)
         {
             OnLogData?.Invoke($"[{DateTime.Now}](Rank:Error): {e.Message}\r", LogLevel.Error);
         }
 
+        private void RaiseErrorOutput(string content)
+        {
+            OnLogData?.Invoke($"[{DateTime.Now}](Rank:Error): {content}\r", LogLevel.Error);
+        }
+
+        private void RaiseLogOutput(string content)
+        {
+            OnLogData?.Invoke($"[{DateTime.Now}] : {content}\r", LogLevel.Other);
+        }
+
         #endregion
 
-        public event EventHandler<IEnumerable<string>> OnProtocolsChanged;
     }
 
 }

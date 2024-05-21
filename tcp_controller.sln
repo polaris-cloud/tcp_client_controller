@@ -55,7 +55,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ForTestConsole", "ForTestCo
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Storage", "Storage", "{381E4020-D359-4924-8A26-B90C55F32FE7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Polaris.Storage", "Polaris.Storage\Polaris.Storage.csproj", "{EF162E09-BF72-48E4-A3EB-0D919E714A97}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polaris.Storage", "Polaris.Storage\Polaris.Storage.csproj", "{EF162E09-BF72-48E4-A3EB-0D919E714A97}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

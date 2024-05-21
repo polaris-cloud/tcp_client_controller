@@ -1,6 +1,6 @@
 ﻿using FuzzySharp.SimilarityRatio.Scorer.Composite;
 
-namespace Bee.Modules.Script.Shared;
+namespace Bee.Modules.Script.Shared.Intellisense;
 
 public class LengthMatchingScorer : WeightedRatioScorer
 {
@@ -16,7 +16,7 @@ public class LengthMatchingScorer : WeightedRatioScorer
         }
 
         // 否则使用默认的相似度评分算法
-        return base.Score(s1,s2);
+        return base.Score(s1, s2);
     }
-    
+
 }

@@ -1,24 +1,16 @@
 ﻿using Prism.Commands;
 using Prism.Mvvm;
 using System;
-using System.CodeDom;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Media.Animation;
 using Bee.Core.DataSource;
-using Bee.Core.Json;
 using Bee.Modules.Script.Settings;
-using Bee.Modules.Script.Shared;
 using Bee.Services.Interfaces;
 using Polaris.Protocol.Model;
 using Polaris.Storage.Json;
-using Newtonsoft.Json.Linq;
 using Polaris.Storage.WinSystem;
 using Exception = System.Exception;
 
@@ -243,8 +235,7 @@ namespace Bee.Modules.Script.ViewModels
                 return;
 
             
-
-
+            
             await JsonFile.SaveDataAsync(new InstructionSetting()
             {
                 Name = InstructionName,
@@ -256,6 +247,9 @@ namespace Bee.Modules.Script.ViewModels
             
 
         }
+
+
+        
 
 
         private async Task  OpenNewInstructionSet()

@@ -20,8 +20,7 @@ namespace Bee.Modules.Console.ViewModels
 
         public ViewAViewModel()
         {
-            Message = "View A ";
-            
+            Message = "Todo";
         }
 
         public string ShellIcon { get; } = "Console";

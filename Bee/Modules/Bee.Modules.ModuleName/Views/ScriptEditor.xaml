@@ -296,7 +296,9 @@
                             Text="Editor" />
                     </StackPanel>
                 </GroupBox.Header>
-                <ContentControl Content="{Binding SelectedProtocolFormat}" ContentTemplate="{StaticResource ProtocolFormatTemplate}" />
+                <ContentControl 
+                    Content="{Binding SelectedProtocolFormat}"
+                    ContentTemplate="{StaticResource ProtocolFormatTemplate}" />
             </GroupBox>
         </Grid>
     </DockPanel>

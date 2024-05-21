@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Polaris.Connect.Tool.Base;
 using System.Diagnostics.Contracts;
 using System.IO;
+using Exception = System.Exception;
 
 namespace Polaris.Connect.Tool
 {
@@ -63,29 +64,33 @@ namespace Polaris.Connect.Tool
         
         
         
-        private async void StartReceiveTask(string contract, TcpClientUnit clientUnit)
+        private  Task StartReceiveTask(string contract, TcpClientUnit clientUnit)
         {
-            try
+            return Task.Run(async() =>
             {
-                byte[] buffer = new byte[_maxReceiveLength];
-                var cts = clientUnit.ReceiveCts;
-                var stream = clientUnit.Connection.GetStream();
-                while (!cts.IsCancellationRequested)
+                try
                 {
-                    int bytesRead = await stream.ReadAsync(buffer, 0, _maxReceiveLength, cts.Token);
-                    if (bytesRead == 0)
+                    byte[] buffer = new byte[_maxReceiveLength];
+                    var cts = clientUnit.ReceiveCts;
+                    await using var  stream = clientUnit.Connection.GetStream();
+                    while (!cts.IsCancellationRequested)
                     {
-                        DisposeComPoint(contract, clientUnit);
-                        break;
+                        int bytesRead = await stream.ReadAsync(buffer, 0, _maxReceiveLength, cts.Token);
+                        if (bytesRead == 0)
+                        {
+                            DisposeComPoint(contract, clientUnit);
+                            break;
+                        }
+                        RaiseDataReceived(new ComReceivedEventArg(contract, buffer.AsMemory(0, bytesRead)));
                     }
-                    RaiseDataReceived(new ComReceivedEventArg(contract,buffer.AsMemory(0, bytesRead)));
                 }
-            }
-            catch (Exception ex)
-            {
-                RaiseReceivedExceptionOccur(new ComErrorEventArg(contract ,ex));
-                DisposeComPoint(contract,clientUnit);
-            }
+                catch (Exception ex)
+                {
+                    RaiseReceivedExceptionOccur(new ComErrorEventArg(contract, ex));
+                    DisposeComPoint(contract, clientUnit);
+                }
+            }); 
+            
         }
 
         private TcpClientUnit GetClientMapping(string contract)
@@ -156,7 +161,7 @@ clientUnit.ReceiveCts.Dispose();
                 string contract = client.Client.RemoteEndPoint!.ToString()!;
                 var comPoint = new TcpClientUnit(client, receivedCts, _maxReceiveLength);
                 AddClientMapping(contract, comPoint);
-                StartReceiveTask(contract,comPoint);
+                _=StartReceiveTask(contract,comPoint);
                 RaiseConnectChanged(new ComEventArg(ComState.Connect, $"Client: {contract}"));
             }
         }

@@ -40,6 +40,9 @@ namespace Bee.Modules.Communication.Views
                 case LogLevel.Fatal:
                     brush = Brushes.Red;
                     break;
+                case LogLevel.Empty:
+                    ReceiveRichTextBox.Document.Blocks.Clear();
+                    return;
                 case LogLevel.Other:
                     brush = Brushes.Brown;
                     break;
@@ -51,11 +54,6 @@ namespace Bee.Modules.Communication.Views
                 ReceiveRichTextBox, Dispatcher, content, brush);
 
         }
-
-
-        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
-        {
-             ReceiveRichTextBox.Document.Blocks.Clear();
-        }
+        
     }
 }

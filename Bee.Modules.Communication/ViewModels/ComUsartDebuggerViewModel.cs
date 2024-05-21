@@ -267,7 +267,9 @@ public ComUsartDebuggerViewModel(
 
         private void RaiseOutputReceivedData(ComReceivedEventArg arg)
         {
-
+            if (!IsActive)
+                return;
+    
             
             string parsedContent =ReceiveFrameFormat==FrameFormat.Hex?
                 EncodeUtil.HexArrayToString(arg.Data.ToArray()," ") :

@@ -1,155 +1,189 @@
-﻿<UserControl x:Class="Bee.Modules.Communication.Views.TcpDebugger"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:prism="http://prismlibrary.com/"
-             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:converters="clr-namespace:Bee.Core.Converters;assembly=Bee.Core"
-             xmlns:viewModels="clr-namespace:Bee.Modules.Communication.ViewModels"
-             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-             prism:ViewModelLocator.AutoWireViewModel="True" 
-             mc:Ignorable="d"
-             d:DataContext="{d:DesignInstance viewModels:TcpDebuggerViewModel}"
-             d:DesignHeight="450" d:DesignWidth="800"
-             >
+﻿<UserControl
+    x:Class="Bee.Modules.Communication.Views.TcpDebugger"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:converters="clr-namespace:Bee.Core.Converters;assembly=Bee.Core"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:prism="http://prismlibrary.com/"
+    xmlns:system="clr-namespace:System;assembly=System.Runtime"
+    xmlns:viewModels="clr-namespace:Bee.Modules.Communication.ViewModels"
+    xmlns:wpf="http://oxyplot.org/wpf"
+    d:DataContext="{d:DesignInstance viewModels:TcpDebuggerViewModel}"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    prism:ViewModelLocator.AutoWireViewModel="True"
+    mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
 
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.groupbox.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textblock.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.combobox.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml"/>
-            
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.groupbox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textblock.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.combobox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
+
             </ResourceDictionary.MergedDictionaries>
+            <ObjectDataProvider
+                x:Key="StreamTypeEnum"
+                MethodName="GetValues"
+                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="viewModels:StreamType" />
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
             <!--<SolidColorBrush x:Key="PrimaryHueMidBrush" Color="#3949ab"/>
             <SolidColorBrush x:Key="PrimaryHueLightBrush" Color="#3949ab"/>-->
-            <converters:EnumToBoolConverter x:Key="SpecificEnum"/>
+            <converters:EnumToBoolConverter x:Key="SpecificEnum" />
+            <converters:EnumToVisibilityConverter x:Key="EnumToVis" />
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
-            <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="0.3*"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.3*" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <DockPanel>
-            <GroupBox  DockPanel.Dock="Top"
-                   Margin="5"
-                   Header="网络设置"
-                   materialDesign:ColorZoneAssist.Mode="SecondaryMid"
-            >
+            <GroupBox
+                Margin="5"
+                materialDesign:ColorZoneAssist.Mode="SecondaryMid"
+                DockPanel.Dock="Top"
+                Header="网络设置">
                 <DockPanel>
-                    <DockPanel DockPanel.Dock="Top"  IsEnabled="{Binding CanOpenState}">
-                        <ComboBox materialDesign:HintAssist.Hint="协议类型" DockPanel.Dock="Top" Margin="5 10"
-                                  Style="{StaticResource MaterialDesignFloatingHintComboBox}"
-                                  ItemsSource="{Binding NetTypes}"
-                                  SelectedItem="{Binding SelNetType}"
-                        />
-                        <ComboBox materialDesign:HintAssist.Hint="本地主机地址"  Margin="5 10" DockPanel.Dock="Top"
-                                  Style="{StaticResource MaterialDesignFloatingHintComboBox}"
-                                  ItemsSource="{Binding IPAddresses}"
-                                  SelectedItem="{Binding SelIPAddress}"
-                        >
+                    <DockPanel DockPanel.Dock="Top" IsEnabled="{Binding CanOpenState}">
+                        <ComboBox
+                            Margin="5,10"
+                            materialDesign:HintAssist.Hint="协议类型"
+                            DockPanel.Dock="Top"
+                            ItemsSource="{Binding NetTypes}"
+                            SelectedItem="{Binding SelNetType}"
+                            Style="{StaticResource MaterialDesignFloatingHintComboBox}" />
+                        <ComboBox
+                            Margin="5,10"
+                            materialDesign:HintAssist.Hint="本地主机地址"
+                            DockPanel.Dock="Top"
+                            ItemsSource="{Binding IPAddresses}"
+                            SelectedItem="{Binding SelIPAddress}"
+                            Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                             <b:Interaction.Triggers>
                                 <b:EventTrigger EventName="DropDownOpened">
-                                    <prism:InvokeCommandAction Command="{Binding RefreshLocalIPCommand}"/>
+                                    <prism:InvokeCommandAction Command="{Binding RefreshLocalIPCommand}" />
                                 </b:EventTrigger>
                             </b:Interaction.Triggers>
                         </ComboBox>
-                        <TextBox  materialDesign:HintAssist.Hint="端口号"  Margin="5 20" DockPanel.Dock="Top"
-                                  Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                                  Text="{Binding Port,UpdateSourceTrigger=PropertyChanged}"
-                        />
+                        <TextBox
+                            Margin="5,20"
+                            materialDesign:HintAssist.Hint="端口号"
+                            DockPanel.Dock="Top"
+                            Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                            Text="{Binding Port, UpdateSourceTrigger=PropertyChanged}" />
                     </DockPanel>
-                   
-                    <Grid >
-                        <Button Margin="5"  
-                                HorizontalAlignment="Right"
-                                Background="CornflowerBlue"
-                                Command="{Binding ConnectCommand}" Cursor="Hand"
-                                Visibility="{Binding CanOpenState,Converter={StaticResource BooleanToVisibilityConverter}}"
-                        >
+
+                    <Grid>
+                        <Button
+                            Margin="5"
+                            HorizontalAlignment="Right"
+                            Background="CornflowerBlue"
+                            Command="{Binding ConnectCommand}"
+                            Cursor="Hand"
+                            Visibility="{Binding CanOpenState, Converter={StaticResource BooleanToVisibilityConverter}}">
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon
-                                    Kind="LanConnect" 
+                                    Width="20"
                                     Height="20"
-                                    Width="20" Margin="2 0"
-                                />
+                                    Margin="2,0"
+                                    Kind="LanConnect" />
                                 <TextBlock>打开</TextBlock>
                             </StackPanel>
                         </Button>
-                        <Button Margin="5"  
-                                HorizontalAlignment="Right"
-                                Background="CornflowerBlue"
-                                Command="{Binding DisconnectCommand}" Cursor="Hand"
-                                Visibility="{Binding CanOpenState, Converter={StaticResource InverseBoolToVisConverter}}"
-                        >
+                        <Button
+                            Margin="5"
+                            HorizontalAlignment="Right"
+                            Background="CornflowerBlue"
+                            Command="{Binding DisconnectCommand}"
+                            Cursor="Hand"
+                            Visibility="{Binding CanOpenState, Converter={StaticResource InverseBoolToVisConverter}}">
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon
-                                    Kind="LanDisconnect" 
+                                    Width="20"
                                     Height="20"
-                                    Width="20" Margin="2 0"
-                                />
+                                    Margin="2,0"
+                                    Kind="LanDisconnect" />
                                 <TextBlock>关闭</TextBlock>
                             </StackPanel>
                         </Button>
                     </Grid>
                 </DockPanel>
             </GroupBox>
-            <GroupBox  DockPanel.Dock="Top"
-                       Margin="5"
-                       materialDesign:ColorZoneAssist.Mode="SecondaryMid"
-                Header="接收设置"
-               
-                >
+            <GroupBox
+                Margin="5"
+                materialDesign:ColorZoneAssist.Mode="SecondaryMid"
+                DockPanel.Dock="Top"
+                Header="接收设置">
                 <DockPanel>
-                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                        <RadioButton  Style="{StaticResource MaterialDesignDarkRadioButton}" 
-                                      IsChecked="{Binding SendFrameFormat, Converter={StaticResource SpecificEnum},ConverterParameter=Ascii}"
-                                      Content="Ascii" 
-                                      Margin="5"/>
-                        <RadioButton  Style="{StaticResource MaterialDesignDarkRadioButton}" 
-                                      IsChecked="{Binding SendFrameFormat, Converter={StaticResource SpecificEnum},ConverterParameter=Hex}"
-                                      Content="Hex"  Margin="5"/>
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                        <RadioButton
+                            Margin="5"
+                            Content="Ascii"
+                            IsChecked="{Binding SendFrameFormat, Converter={StaticResource SpecificEnum}, ConverterParameter=Ascii}"
+                            Style="{StaticResource MaterialDesignDarkRadioButton}" />
+                        <RadioButton
+                            Margin="5"
+                            Content="Hex"
+                            IsChecked="{Binding SendFrameFormat, Converter={StaticResource SpecificEnum}, ConverterParameter=Hex}"
+                            Style="{StaticResource MaterialDesignDarkRadioButton}" />
                     </StackPanel>
-                    <CheckBox  Content="日志模式显示" Margin="5"  DockPanel.Dock="Top"
-                               VerticalAlignment="Center" IsChecked="{Binding IsOutputAsLog}"
-                    />
+                    <CheckBox
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        Content="日志模式显示"
+                        DockPanel.Dock="Top"
+                        IsChecked="{Binding IsOutputAsLog}" />
                 </DockPanel>
             </GroupBox>
             <GroupBox
                 Margin="5"
-                Header="发送设置"
                 materialDesign:ColorZoneAssist.Mode="SecondaryMid"
-               
-                >
+                Header="发送设置">
                 <DockPanel LastChildFill="False">
-                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                        <RadioButton  Style="{StaticResource MaterialDesignDarkRadioButton}" Content="Ascii"
-                                      IsChecked="{Binding ReceiveFrameFormat, Converter={StaticResource SpecificEnum},ConverterParameter=Ascii}"
-                                      Margin="5" DockPanel.Dock="Top"/>
-                        <RadioButton  Style="{StaticResource MaterialDesignDarkRadioButton}" Content="Hex" 
-                                      IsChecked="{Binding ReceiveFrameFormat, Converter={StaticResource SpecificEnum},ConverterParameter=Hex}"
-                                      Margin="5" DockPanel.Dock="Top"
-                                      x:Name="SendHexCheckBtn"
-                        />
-                        <CheckBox  Content="发送新行" Margin="5"  DockPanel.Dock="Top"
-                                   IsChecked="{Binding IsAddNewLineWhenSend}"
-                        />
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                        <RadioButton
+                            Margin="5"
+                            Content="Ascii"
+                            DockPanel.Dock="Top"
+                            IsChecked="{Binding ReceiveFrameFormat, Converter={StaticResource SpecificEnum}, ConverterParameter=Ascii}"
+                            Style="{StaticResource MaterialDesignDarkRadioButton}" />
+                        <RadioButton
+                            x:Name="SendHexCheckBtn"
+                            Margin="5"
+                            Content="Hex"
+                            DockPanel.Dock="Top"
+                            IsChecked="{Binding ReceiveFrameFormat, Converter={StaticResource SpecificEnum}, ConverterParameter=Hex}"
+                            Style="{StaticResource MaterialDesignDarkRadioButton}" />
+                        <CheckBox
+                            Margin="5"
+                            Content="发送新行"
+                            DockPanel.Dock="Top"
+                            IsChecked="{Binding IsAddNewLineWhenSend}" />
                     </StackPanel>
-                    <StackPanel  Orientation="Horizontal" DockPanel.Dock="Top">
-                        <CheckBox  Content="定时发送" Margin="5"  DockPanel.Dock="Top"
-                                   VerticalAlignment="Center"
-                                   IsChecked="{Binding IsSendAtRegularTime}"
-                        />
-                        <TextBox  materialDesign:HintAssist.Hint="周期: "
-                                  materialDesign:TextFieldAssist.SuffixText="ms"
-                                  Style="{StaticResource MaterialDesignFloatingHintTextBox}"  
-                                  VerticalAlignment="Center"
-                                  Text="{Binding SendCycleTime}"
-                                  Width="100" Margin="5"/>
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                        <CheckBox
+                            Margin="5"
+                            VerticalAlignment="Center"
+                            Content="定时发送"
+                            DockPanel.Dock="Top"
+                            IsChecked="{Binding IsSendAtRegularTime}" />
+                        <TextBox
+                            Width="100"
+                            Margin="5"
+                            VerticalAlignment="Center"
+                            materialDesign:HintAssist.Hint="周期: "
+                            materialDesign:TextFieldAssist.SuffixText="ms"
+                            Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                            Text="{Binding SendCycleTime}" />
                     </StackPanel>
                 </DockPanel>
             </GroupBox>
@@ -157,46 +191,75 @@
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition />
-                <RowDefinition Height="0.4*"/>
+                <RowDefinition Height="0.4*" />
             </Grid.RowDefinitions>
-            <GroupBox  DockPanel.Dock="Top"
-                       Margin="5"
-                       materialDesign:ColorZoneAssist.Mode="SecondaryMid">
+            <GroupBox
+                Margin="5"
+                materialDesign:ColorZoneAssist.Mode="SecondaryMid"
+                DockPanel.Dock="Top">
                 <GroupBox.Header>
-                    <DockPanel LastChildFill="False" >
-                        <TextBlock Text="接收数据区" DockPanel.Dock="Left"  VerticalAlignment="Center" Foreground="White"/>
-
-                        <Button  Style="{StaticResource MaterialDesignToolForegroundButton}" DockPanel.Dock="Right"
-                                 Margin="20 5"
-                                 Foreground="White"
-                                 Click="ButtonBase_OnClick"
-                        >
+                    <DockPanel LastChildFill="False">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            DockPanel.Dock="Left"
+                            Foreground="White"
+                            Text="接收数据区" />
+                        <TextBlock
+                            Margin="10,5"
+                            VerticalAlignment="Center"
+                            DockPanel.Dock="Left"
+                            Foreground="White"
+                            Text=" Stream: " />
+                        <ComboBox
+                            Padding="5"
+                            VerticalAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            materialDesign:HintAssist.Hint="流方式"
+                            materialDesign:TextFieldAssist.DecorationVisibility="Hidden"
+                            Background="White"
+                            BorderThickness="0"
+                            DockPanel.Dock="Left"
+                            ItemsSource="{Binding Source={StaticResource StreamTypeEnum}}"
+                            SelectedItem="{Binding SelStreamType}" />
+                        <Button
+                            Margin="20,5"
+                            Command="{Binding EmptyReceiveCommand}"
+                            DockPanel.Dock="Right"
+                            Foreground="White"
+                            Style="{StaticResource MaterialDesignToolForegroundButton}">
                             <materialDesign:PackIcon
-                                Kind="DeleteSweep" 
+                                Width="25"
                                 Height="25"
-                                Width="25"/>
+                                Kind="DeleteSweep" />
                         </Button>
                     </DockPanel>
                 </GroupBox.Header>
                 <DockPanel>
                     <RichTextBox
-                        materialDesign:TextFieldAssist.DecorationVisibility="Hidden"
-                        IsReadOnly="True"
-                        BorderThickness="0"
-                        VerticalScrollBarVisibility="Auto"
                         x:Name="ReceiveRichTextBox"
+                        materialDesign:TextFieldAssist.DecorationVisibility="Hidden"
+                        BorderThickness="0"
                         FontSize="15"
-                    />
+                        IsReadOnly="True"
+                        VerticalScrollBarVisibility="Auto"
+                        Visibility="{Binding SelStreamType, Converter={StaticResource EnumToVis}, ConverterParameter=Byte}"  />
+                    <wpf:PlotView 
+                        x:Name="realTimeGraph"
+                        Model="{Binding TimePlotModel}" Visibility="{Binding SelStreamType, Converter={StaticResource EnumToVis}, ConverterParameter=Graph}" />
                 </DockPanel>
             </GroupBox>
-            <GroupBox Grid.Row="1"  DockPanel.Dock="Top"
-                     
-                      materialDesign:ColorZoneAssist.Mode="SecondaryMid"
-                      Margin="5">
+            <GroupBox
+                Grid.Row="1"
+                Margin="5"
+                materialDesign:ColorZoneAssist.Mode="SecondaryMid"
+                DockPanel.Dock="Top">
                 <GroupBox.Header>
-                    <DockPanel LastChildFill="False" >
-                        <TextBlock Text="发送数据区" DockPanel.Dock="Left"  VerticalAlignment="Center" Foreground="White"
-                        />
+                    <DockPanel LastChildFill="False">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            DockPanel.Dock="Left"
+                            Foreground="White"
+                            Text="发送数据区" />
 
                         <materialDesign:ColorZone
                             Margin="16,0,0,0"
@@ -204,23 +267,16 @@
                             Panel.ZIndex="1"
                             materialDesign:ElevationAssist.Elevation="Dp2"
                             CornerRadius="2"
-                            Mode="Standard"
                             DockPanel.Dock="Left"
-                        >
+                            Mode="Standard">
                             <Grid>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition
-                                        Width="Auto" />
-                                    <ColumnDefinition
-                                        Width="*" />
-                                    <ColumnDefinition
-                                        Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <Button
-                                    Style="{StaticResource MaterialDesignToolButton}">
-                                    <materialDesign:PackIcon
-                                        Kind="IpOutline"
-                                        Opacity=".56" />
+                                <Button Style="{StaticResource MaterialDesignToolButton}">
+                                    <materialDesign:PackIcon Kind="IpOutline" Opacity=".56" />
                                 </Button>
                                 <ComboBox
                                     Grid.Column="1"
@@ -231,10 +287,9 @@
                                     materialDesign:TextFieldAssist.DecorationVisibility="Hidden"
                                     BorderThickness="0"
                                     ItemsSource="{Binding ConnectClients}"
-                                    SelectedItem="{Binding SelClient}"
-                                    />
+                                    SelectedItem="{Binding SelClient}" />
 
-                            
+
 
                                 <!--<Button
                Grid.Column="2"
@@ -248,43 +303,42 @@
                         </materialDesign:ColorZone>
 
 
-                        <Button  Style="{StaticResource MaterialDesignToolForegroundButton}" DockPanel.Dock="Right"
-                                 Margin="5"
-                                 Foreground="White"
-                                 Command="{Binding SendCommand}"
-                        >
+                        <Button
+                            Margin="5"
+                            Command="{Binding SendCommand}"
+                            DockPanel.Dock="Right"
+                            Foreground="White"
+                            Style="{StaticResource MaterialDesignToolForegroundButton}">
                             <materialDesign:PackIcon
-                                Kind="Send" 
-                                Height="25"
                                 Width="25"
-                                />
+                                Height="25"
+                                Kind="Send" />
                         </Button>
-                        <Button  Style="{StaticResource MaterialDesignToolForegroundButton}" DockPanel.Dock="Right"
-                                 Margin="20 5"
-                                 Foreground="White"
-                        >
+                        <Button
+                            Margin="20,5"
+                            DockPanel.Dock="Right"
+                            Foreground="White"
+                            Style="{StaticResource MaterialDesignToolForegroundButton}">
                             <materialDesign:PackIcon
-                                Kind="DeleteSweep" 
-                                Height="25"
                                 Width="25"
-                                />
+                                Height="25"
+                                Kind="DeleteSweep" />
                         </Button>
-                       
+
                     </DockPanel>
                 </GroupBox.Header>
                 <DockPanel>
-                    <TextBox 
+                    <TextBox
+                        x:Name="SendTextBox"
+                        materialDesign:HintAssist.Hint="输入十六进制时,两数之间插入空格"
                         materialDesign:TextFieldAssist.DecorationVisibility="Hidden"
                         BorderThickness="0"
-                        VerticalScrollBarVisibility="Auto"
-                        x:Name="SendTextBox"
                         FontSize="15"
                         Text="{Binding InputData}"
-                        materialDesign:HintAssist.Hint="输入十六进制时,两数之间插入空格"
-                    />
+                        VerticalScrollBarVisibility="Auto" />
                 </DockPanel>
             </GroupBox>
         </Grid>
     </Grid>
-           
-   </UserControl>
+
+</UserControl>

@@ -91,6 +91,17 @@ namespace Polaris.Protocol.Parser
             return complete;
         }
 
+        private bool ValidateRawRulesInternal(IEnumerable<FrameRuntimeSection> runtimeTokens)
+        {
+            return FrameRuntimeSection.Validate(runtimeTokens); 
+        }
+
+        public bool ValidateRawRules()
+        {
+            var sendTokens = _sendFrameSections.OfType<FrameRuntimeSection>().ToList();
+            var responseTokens=_responseFrameSections.OfType<FrameRuntimeSection>().ToList();
+            return FrameRuntimeSection.Validate(sendTokens) && FrameRuntimeSection.Validate(responseTokens);
+        }
 
 
         /// <summary>
@@ -104,15 +115,19 @@ namespace Polaris.Protocol.Parser
         {
             debugLine = _sendDescription;
             var runtimeTokens = _sendFrameSections.OfType<FrameRuntimeSection>().ToList();
-            if (!FrameRuntimeSection.Validate(runtimeTokens))
-                throw new SectionParseException($"'{nameof(runtimeTokens)}' in '{nameof(complete)}' 验证失败:存在空值或者重复项", nameof(complete));
+            if (!ValidateRawRulesInternal(runtimeTokens))
+                throw new SectionParseException($"'{nameof(runtimeTokens)}' in '{nameof(complete)}' 规则验证失败:存在空值或者重复项", nameof(complete));
+            
             var runtimeTokensDic = runtimeTokens.ToDictionary(t => t.Name!, t => t);
-            foreach (var pair in ParseImportValue(complete))
+            var parsedPairs = ParseImportValue(complete).ToList();
+             if(runtimeTokensDic.Count!=parsedPairs.Count)
+                 throw new SectionParseException($"'{nameof(runtimeTokens)}' in '{nameof(complete)}' 运行时验证失败:存在空值或token识别错误", nameof(complete));
+            foreach (var pair in parsedPairs)
             {
                 if (runtimeTokensDic.TryGetValue(pair.Key, out var token))
                 {
                     if (!token.Validate(pair.Value))
-                        throw new SectionParseException($"'{pair.Key}' in '{complete}' 验证失败: 参数设定值超过范围", nameof(complete));
+                        throw new SectionParseException($"'{pair.Key}' in '{complete}' 运行时验证失败: 参数设定值超过范围( {token.LowerLimit}~{token.UpperLimit} )", nameof(complete));
 
                     debugLine = debugLine.Replace($"{{{pair.Key}}}", pair.Value);
 
@@ -123,6 +138,7 @@ namespace Polaris.Protocol.Parser
                     throw new ArgumentException($"SendFrameDescription '{pair.Key}' in '{nameof(complete)}' does not correspond to a runtime token.", nameof(complete));
                 }
             }
+            
             return ExtractCompleteFrameFrom(_sendFrameSections);
         }
 
@@ -135,6 +151,9 @@ namespace Polaris.Protocol.Parser
             }
             return sum;
         }
+        
+        
+        
         /// <summary>
         /// 抽出返回帧中的参数值
         /// </summary>
@@ -163,10 +182,10 @@ namespace Polaris.Protocol.Parser
         /// <exception cref="T:System.ArgumentException">存在重复的section</exception>>
         public bool ParseResponseByteFrame(byte[] response)
         {
-            if (GetFrameLength(_responseFrameSections) != response.Length)
-                throw new ArgumentException(
-                    $"the length of {nameof(response)} is not equal to the total length of{nameof(_responseFrameSections)}",
-                    nameof(response));
+            
+                //throw new ArgumentException(
+                //    $"the length of {nameof(response)} is not equal to the total length of{nameof(_responseFrameSections)}",
+                //    nameof(response));
 
             ExtractResponseValue(response, _responseFrameSections);
             var complete = ExtractCompleteFrameFrom(_responseFrameSections);
@@ -174,7 +193,15 @@ namespace Polaris.Protocol.Parser
             return complete.SequenceEqual(response);
         }
 
+        public bool CheckResponseFrameLength(IEnumerable<byte> response)
+        {
+            return GetFrameLength(_responseFrameSections) != response.Count();
+        }
 
+        public int  GetResponseFrameLength()
+        {
+            return GetFrameLength(_responseFrameSections);
+        }
         public string GenerateResponseScript(byte[] response)
         {
             StringBuilder sb = new StringBuilder($"{_behavior} return ");

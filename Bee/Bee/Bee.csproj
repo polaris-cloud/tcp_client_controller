@@ -3,6 +3,8 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows7.0</TargetFramework>
     <UseWPF>true</UseWPF>
+    <StartupObject>Bee.App</StartupObject>
+    <ApplicationIcon>network.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="MDIX\**" />
@@ -11,7 +13,7 @@
     <Page Remove="MDIX\**" />
   </ItemGroup>
   <ItemGroup>
-    <None Remove="Resources\newyear.jpg" />
+    <Content Include="network.ico" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MaterialDesignThemes.MahApps" Version="0.3.0" />
@@ -28,6 +30,8 @@
     <ProjectReference Include="..\Services\Bee.Services\Bee.Services.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Resources\net.png">
+    </Resource>
     <Resource Include="Resources\newyear.jpg" />
   </ItemGroup>
 </Project>

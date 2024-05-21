@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -11,24 +9,28 @@ using System.Windows.Media;
 using System.Xml;
 using Bee.Core.Controls;
 using Bee.Core.ModuleExtension;
-using Bee.Modules.Script.Shared;
+using Bee.Modules.Script.Shared.Intellisense;
 using Bee.Modules.Script.ViewModels;
 using ICSharpCode.AvalonEdit.CodeCompletion;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Editing;
 using ICSharpCode.AvalonEdit.Highlighting;
-using static System.Net.Mime.MediaTypeNames;
+using Polaris.Protocol.Model;
+using Polaris.Protocol.Parser;
 
 namespace Bee.Modules.Script.Views
 {
 
-    // 自动完成数据的定义
-     class CompletionData : ICompletionData
+    class CompletionData : ICompletionData
     {
-        public CompletionData(string text)
+        private readonly ProtocolFormat _format;
+
+        public CompletionData(ProtocolFormat format)
         {
-            Text = text;
+            _format = format;
+            Text = format.BehaviorKeyword;
         }
+
 
         public ImageSource Image => null;
 
@@ -42,23 +44,35 @@ namespace Bee.Modules.Script.Views
 
         public void Complete(TextArea textArea, ISegment completionSegment, EventArgs insertionRequestEventArgs)
         {
-            // 在文本编辑器中插入自动完成的文本
-            textArea.Document.Replace(completionSegment, Text);
+            try
+            {
+                // 在文本编辑器中插入自动完成的文本
+                ProtocolScriptParser protocolScriptParser = ProtocolScriptParser.BuildScriptParser(_format);
+                string sendScript = protocolScriptParser.GenerateSendScript();
+
+                int caretOffset = textArea.Caret.Offset;
+                int startOffset = TextUtilities.GetNextCaretPosition(textArea.Document, caretOffset, LogicalDirection.Backward, CaretPositioningMode.WordStart);
+
+                textArea.Document.Replace(startOffset, caretOffset - startOffset, sendScript);
+            }
+            catch (Exception e)
+            {
+                textArea.Document.Replace(completionSegment,$"Error:{e.Message}");
+            }
+            
         }
     }
 
 
-     /// <summary>
+    /// <summary>
     /// Interaction logic for ScriptDebugger
     /// </summary>
     [ModuleSubViewTabItem("Script调试器", "SemanticWeb",NavigateUri = nameof(ScriptDebugger))]
     public partial class ScriptDebugger : UserControl
     {
-
-        private readonly List<string> autoCompleteList = new List<string> { "apple", "banana", "cherry" };
+        // 自动完成数据的定义
+        
         private CompletionWindow completionWindow;
-        private IEnumerable<string> dataCache;
-        private IEnumerable<string> filterDataCache; 
 
         public ScriptDebugger()
         {
@@ -67,7 +81,6 @@ namespace Bee.Modules.Script.Views
             SetHighlightRuleForAvalonEdit();
 
             ((IEasyLoggingBindView)DataContext).OnLogData += Log;
-            ((ITransferProtocols)DataContext).OnProtocolsChanged += ChangeCompletionList;
             // 监听文本编辑器的键盘事件
             textEditor.TextArea.TextEntering += TextArea_TextEntering;
             textEditor.TextArea.TextEntered += TextArea_TextEntered;
@@ -118,7 +131,7 @@ namespace Bee.Modules.Script.Views
         {
             string currentWord = GetCurrentWord();
             // 显示自动完成窗口
-            var col =FuzzySearchUtil.FilterAndSortByFuzzySharp(currentWord, dataCache);
+            var col =FuzzySearchUtil.FilterAndSortByFuzzySharp(currentWord, BindingProtocols.GetProtocolFormats(textEditor));
             ShowCompletionWindow(col);
             
             
@@ -152,16 +165,9 @@ namespace Bee.Modules.Script.Views
 
             return string.Empty;
         }
-
-
-        private void ChangeCompletionList(object sender,IEnumerable<string> completionList)
-        {
-
-            dataCache = completionList;
-        }
-
-
-        private void ShowCompletionWindow(IEnumerable<string> filterCache)
+        
+        
+        private void ShowCompletionWindow(IEnumerable<ProtocolFormat> filterCache)
         {
 
             completionWindow = new CompletionWindow(textEditor.TextArea);
@@ -179,36 +185,38 @@ namespace Bee.Modules.Script.Views
             // 显示自动完成窗口
             completionWindow.Show();
             
-            completionWindow.Closed += delegate
-            {
-                completionWindow = null;
-            };
-            
         }
 
 
         public void Log(string content, LogLevel logLevel)
         {
-            switch (logLevel)
-            {
-                case LogLevel.Info:
-                    outputRichTextBox.WriteOutputData(Dispatcher, content,Brushes.Blue);
-                    break;
-                case LogLevel.Debug:
-                    DebugRichTextBox.WriteOutputData(Dispatcher, content, Brushes.Black);
-                    break;
-                case LogLevel.Warn:
-                    break;
-                case LogLevel.Error:
-                    DebugRichTextBox.WriteOutputData(Dispatcher, content, Brushes.Red);
-                    break;
-                case LogLevel.Fatal:
-                    break;
-                case LogLevel.Other:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(logLevel), logLevel, null);
-            }
+            Dispatcher.RunOnUiDispatcher(
+                () =>
+                {
+                    switch (logLevel)
+                    {
+                        case LogLevel.Info:
+                            outputRichTextBox.WriteOutputData(Dispatcher, content, Brushes.Blue);
+                            break;
+                        case LogLevel.Debug:
+                            DebugRichTextBox.WriteOutputData(Dispatcher, content, Brushes.Black);
+                            break;
+                        case LogLevel.Warn:
+                            break;
+                        case LogLevel.Error:
+                            DebugRichTextBox.WriteOutputData(Dispatcher, content, Brushes.Red);
+                            break;
+                        case LogLevel.Fatal:
+                            break;
+                        case LogLevel.Other:
+                            LoggerRichTextBox.WriteOutputData(Dispatcher, content, Brushes.Blue);
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(logLevel), logLevel, null);
+                    }
+                }
+            );
+            
             
         }
 
@@ -221,12 +229,16 @@ namespace Bee.Modules.Script.Views
         {
             DebugRichTextBox.Document.Blocks.Clear();
         }
+        private void LoggerEmptyButton_OnClickEmptyButton_OnClickEmptyButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            LoggerRichTextBox.Document.Blocks.Clear();
+        }
 
         private void TextEditor_OnPreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             if (Keyboard.Modifiers == ModifierKeys.Control)
             {
-                double fontSize = textEditor.FontSize + e.Delta / 25.0;
+                double fontSize = textEditor.FontSize + e.Delta / 40.0;
 
                 if (fontSize < 6)
                     textEditor.FontSize = 6;
@@ -241,5 +253,7 @@ namespace Bee.Modules.Script.Views
                 e.Handled = true;
             }
         }
+
+        
     }
 }

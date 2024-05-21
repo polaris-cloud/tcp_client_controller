@@ -461,25 +461,18 @@ int num = 0;
                 }
             });
         }
-
-
-
+        
         private void send_msg(byte[] buffer)
         {
-
             try
             {
-
                 client.GetStream().Write(buffer, 0, buffer.Length);
                 SendFrameNum++;
-
             }
             catch (Exception e)
             {
                 MessageBox.Show(e.Message);
             }
-
-
         }
 
 

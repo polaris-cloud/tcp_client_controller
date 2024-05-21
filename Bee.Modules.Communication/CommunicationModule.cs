@@ -26,7 +26,6 @@ namespace Bee.Modules.Communication
         public CommunicationModule(IRegionManager regionManager)
         {
             _regionManager = regionManager;
-            ;
             Uri = Assembly.GetExecutingAssembly().GetName().Name;
         }
 
